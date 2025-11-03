@@ -1,8 +1,9 @@
 import type {Station} from './stationLoader.js';
 import type {Line, LineId} from './lines.js';
 import type {GameState} from './state.js';
+import { AleaPRNG, aleaPRNG } from './aleaPRNG.js';
 
-export function hashString(s: string): number {
+function oldHashString(s: string): number {
 	let h = 2166136261 >>> 0;
 	for (let i = 0; i < s.length; i++) {
 		h ^= s.charCodeAt(i);
@@ -23,9 +24,37 @@ export function arrayEquals<A>(a: A[], b: A[]): boolean {
 }
 
 export function pickDailyStation(dateKey: string, stations: Station[]): Station {
-	if (dateKey === "2025-10-24") return stations.find(s => s.id === "Q5615996")!;
-	const idx = hashString('metrodlesp8:' + dateKey) % stations.length;
-	return stations[idx];
+	if (dateKey >= "2025-11-03") {
+		// Calculate the day number since a fixed epoch
+		const epoch = new Date("2025-11-01");
+		const today = new Date(dateKey);
+		const dayNum = Math.floor((today.getTime() - epoch.getTime()) / (1000 * 60 * 60 * 24));
+		const N = stations.length;
+		const cycleNum = Math.floor(dayNum / N);
+		const idxInCycle = dayNum % N;
+
+		// Use AleaPRNG seeded with cycleNum for shuffle
+		const prng = aleaPRNG(cycleNum.toString());
+
+		// Fisher-Yates shuffle
+		function shuffleArray<T>(arr: T[], prng: AleaPRNG): T[] {
+			const a = arr.slice();
+			for (let i = a.length - 1; i > 0; i--) {
+				const j = Math.floor(prng.range(0, i));
+				[a[i], a[j]] = [a[j], a[i]];
+			}
+			return a;
+		}
+		
+		const shuffled = shuffleArray(stations, prng);
+		return shuffled[idxInCycle];
+	} else if (dateKey >= "2025-10-25") {
+		const idx = oldHashString("metrodlesp8:" + dateKey);
+		return stations[idx % stations.length];
+	} else {
+		const idx = oldHashString("metrodlesp-" + dateKey);
+		return stations[idx % stations.length];
+	}
 }
 
 export function searchCandidates(query: string, stations: Station[], LINES: Record<string, Line>): Station[] {

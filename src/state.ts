@@ -12,9 +12,27 @@ export type Stats = { played: number; wins: number; streak: number; best: number
 
 const STORAGE_KEY = 'metrodlesp:state';
 const STATS_KEY = 'metrodlesp:stats';
+const DEBUG_STATIONS_LOG = false;
 
 export function loadState(dateKey: string, stations: Station[]): GameState {
+	if(DEBUG_STATIONS_LOG) {
+		if (stations && stations.length) {
+			const today = new Date(dateKey);
+			for (let i = 0; i < 30; i++) {
+				const d = new Date(today);
+				d.setDate(today.getDate() - i);
+				const debugDateKey = d.toISOString().slice(0, 10);
+				try {
+					const station = pickDailyStation(debugDateKey, stations);
+					console.log(debugDateKey, station?.name, station?.id);
+				} catch (e) {
+					console.log(debugDateKey, 'ERROR', e);
+				}
+			}
+		}
+	}
 	const solution = pickDailyStation(dateKey, stations);
+	console.log(solution);
 	const raw = localStorage.getItem(STORAGE_KEY);
 	if (raw) {
 		try {

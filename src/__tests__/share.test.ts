@@ -20,7 +20,7 @@ test('share text includes title, per-guess lines, attempts, and distances', asyn
 	const distMap = bfsDistances(SE, adj);
 
 	const state = {solutionId: SE.id, dateKey: '2025-10-12', guesses: [ANR.id, REP.id, SE.id], status: 'won' as const};
-	const text = buildShare(state, stations, LINES, distMap);
+	const text = buildShare(state, stations, LINES, distMap, false);
 	const lines = text.split('\n');
 	assert.ok(lines[0].startsWith('Metrodle SP 2025-10-12'));
 	// title + 3 guesses + attempts line + placeholder = 6 lines total

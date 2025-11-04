@@ -81,7 +81,7 @@ function suggestionLineChipsHTML(station: Station, knowledge: { eliminated: Set<
 }
 
 async function shareResult(state: GameState) {
-	const text = logic.buildShare(state, STATIONS, LINES, DIST_FROM_SOLUTION);
+	const text = logic.buildShare(state, STATIONS, LINES, DIST_FROM_SOLUTION, hardMode);
 	// Analytics: share click
 	try { // @ts-ignore
 		gtag('event', 'share_click', {method: 'auto'});
@@ -134,6 +134,8 @@ async function shareResult(state: GameState) {
 // Rendering and interactions
 let gameState: GameState;
 let stats: Stats;
+let hardMode: boolean;
+let dailyRotation: number;
 
 const guessInput = document.getElementById('guessInput') as HTMLInputElement;
 const form = document.getElementById('guessForm') as HTMLFormElement;
@@ -154,6 +156,12 @@ const helpDialog = document.getElementById('helpDialog') as HTMLDialogElement;
 const helpBtn = document.getElementById('helpBtn') as HTMLButtonElement;
 const helpClose = document.getElementById('helpClose') as HTMLButtonElement;
 const statsDialog = document.getElementById('statsDialog') as HTMLDialogElement;
+const hardModeDialog = document.getElementById('hardModeDialog') as HTMLDialogElement;
+const hardModeBtn = document.getElementById('hardModeBtn') as HTMLButtonElement;
+const hardModeClose = document.getElementById('hardModeClose') as HTMLButtonElement;
+const hardModeToggle = document.getElementById('hardModeToggle') as HTMLInputElement;
+const hardModeSuggestion = document.getElementById('hardModeSuggestion') as HTMLDivElement;
+const tryHardModeLink = document.getElementById('tryHardModeLink') as HTMLAnchorElement;
 const statsBtn = document.getElementById('statsBtn') as HTMLButtonElement;
 const statsClose = document.getElementById('statsClose') as HTMLButtonElement;
 const statPlayed = document.getElementById('statPlayed')!;
@@ -247,6 +255,14 @@ function renderStats() {
 	}
 	if (statsShareBtn) {
 		statsShareBtn.disabled = gameState.status === 'playing';
+	}
+	// Show "Try Hard Mode" suggestion if applicable
+	if (hardModeSuggestion) {
+		if (gameState.status === 'won' && gameState.guesses.length <= 3 && !hardMode) {
+			hardModeSuggestion.style.display = 'block';
+		} else {
+			hardModeSuggestion.style.display = 'none';
+		}
 	}
 }
 
@@ -395,6 +411,9 @@ function endGame(won: boolean) {
 		state.saveStats(stats);
 	}
 	// Disable interactive input and refresh UI
+	if (won && hardMode) {
+		renderMap(); // Re-render map immediately on win to remove rotation/hidden lines
+	}
 	updatePlayableUI();
 	renderStats();
 	// Start next-day countdown in stats dialog
@@ -438,6 +457,10 @@ function onSubmitGuess(name: string) {
 	gameState.guesses.push(match.id);
 	state.saveState(gameState);
 	renderGuesses();
+	// Only re-render the map if the guess might change its appearance (hard mode progression)
+	if (hardMode && gameState.guesses.length <= 2) {
+		renderMap();
+	}
 	if (match.id === solution.id) {
 		setHint(`Acertou! Era ${solution.name}.`);
 	} else {
@@ -450,16 +473,23 @@ function onSubmitGuess(name: string) {
 
 function renderMap() {
 	const mapDiv = document.getElementById('mapImage') as HTMLDivElement;
-	mapDiv.innerHTML = '';
+	const indicatorsDiv = document.getElementById('map-indicators') as HTMLDivElement;
+	mapDiv.innerHTML = ''; // Clear only the map container
 	// Determine today's solution and pass its coordinates to the embedded map
 	const solution = stationById(gameState.solutionId);
+	const isWon = gameState.status === 'won';
 	const params = new URLSearchParams();
 	if (typeof solution.lon === 'number' && typeof solution.lat === 'number') {
 		params.set('lon', String(solution.lon));
 		params.set('lat', String(solution.lat));
 		params.set('z', '15'); // default zoom
 	}
-	params.set('lines', linesUrl);
+	if (!hardMode || gameState.guesses.length >= 1 || isWon) {
+		params.set('lines', linesUrl);
+	}
+	if (hardMode && gameState.guesses.length < 2 && !isWon) {
+		params.set('bearing', String(dailyRotation));
+	}
 	const iframe = document.createElement('iframe');
 	// Append MapTiler key if available via Vite env (not present in tests/build output)
 	const VITE_KEY = (import.meta as any).env.VITE_MAPTILER_KEY;
@@ -472,6 +502,30 @@ function renderMap() {
 	iframe.style.border = '0';
 	iframe.setAttribute('loading', 'lazy');
 	mapDiv.appendChild(iframe);
+
+	indicatorsDiv.innerHTML = '';
+	if (hardMode && !isWon) {
+		if (gameState.guesses.length < 2) {
+			const rotated = document.createElement('div');
+			rotated.className = 'map-indicator';
+			rotated.title = 'Mapa girado';
+			rotated.textContent = '🔄';
+			rotated.addEventListener('click', () => {
+				showToast('O mapa está rotacionado. Ele voltará ao normal após o segundo erro.');
+			});
+			indicatorsDiv.appendChild(rotated);
+		}
+		if (gameState.guesses.length < 1) {
+			const hidden = document.createElement('div');
+			hidden.className = 'map-indicator';
+			hidden.title = 'Linhas ocultas';
+			hidden.textContent = '👁️‍🗨️';
+			hidden.addEventListener('click', () => {
+				showToast('As linhas do metrô estão ocultas. Elas aparecerão após o primeiro erro.');
+			});
+			indicatorsDiv.appendChild(hidden);
+		}
+	}
 }
 
 function updatePlayableUI() {
@@ -486,7 +540,6 @@ function initUI() {
 	refreshDatalist();
 	renderGuesses();
 	renderStats();
-	renderMap();
 	shareBtn.disabled = gameState.status === 'playing';
 	updatePlayableUI();
 
@@ -578,6 +631,22 @@ function initUI() {
 			if (statsShareMsg) statsShareMsg.textContent = msg;
 		});
 	}
+
+	hardModeBtn.addEventListener('click', () => hardModeDialog.showModal());
+	hardModeClose.addEventListener('click', () => hardModeDialog.close());
+	tryHardModeLink.addEventListener('click', (e) => {
+		e.preventDefault();
+		statsDialog.close();
+		hardModeDialog.showModal();
+	});
+	hardModeToggle.addEventListener('change', () => {
+		hardMode = hardModeToggle.checked;
+		state.saveHardMode(hardMode);
+		renderMap();
+	});
+
+	// Initial map render
+	renderMap();
 }
 
 // Attempt one-time migration of localStorage from the old GitHub Pages origin.
@@ -687,6 +756,12 @@ async function boot() {
 	STATIONS = await loadStations();
 	gameState = state.loadState(todayKey, STATIONS);
 	stats = state.loadStats();
+	// For testing purposes
+	(window as any).STATIONS = STATIONS;
+	(window as any).gameState = gameState;
+	hardMode = state.loadHardMode();
+	hardModeToggle.checked = hardMode;
+	dailyRotation = logic.getDailyRotation(todayKey);
 	const solution = stationById(gameState.solutionId);
 	let ADJ_GRAPH = await loadAdjacencyGraph();
 	DIST_FROM_SOLUTION = bfsDistances(solution, ADJ_GRAPH);
@@ -702,3 +777,17 @@ async function boot() {
 
 // Start app
 boot();
+
+let toastTimer: any | null = null;
+function showToast(message: string) {
+	const toast = document.getElementById('toast-notification') as HTMLDivElement;
+	toast.textContent = message;
+	toast.classList.add('show');
+	if (toastTimer) {
+		clearTimeout(toastTimer);
+	}
+	toastTimer = setTimeout(() => {
+		toast.classList.remove('show');
+		toastTimer = null;
+	}, 3000);
+}

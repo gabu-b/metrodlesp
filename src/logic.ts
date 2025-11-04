@@ -105,7 +105,8 @@ export function buildShare(
 	state: GameState,
 	stations: Station[],
 	LINES: Record<string, Line>,
-	DIST_FROM_SOLUTION: Map<string, number>
+	DIST_FROM_SOLUTION: Map<string, number>,
+	hardMode: boolean,
 ): string {
 	const solution = stations.find(s => s.id === state.solutionId)!;
 	const rows = state.guesses.map(id => {
@@ -116,7 +117,7 @@ export function buildShare(
 		return `${matchSquares} a ${distTxt} paradas`;
 	});
 	const attempts = state.status === 'won' ? state.guesses.length : 'X';
-	const title = `Metrodle SP ${state.dateKey}`;
+	const title = `Metrodle SP ${state.dateKey}${hardMode ? ' (difícil)' : ''}`;
 	const url = new URL('./', window.location.href).toString();
 	// Remove protocol for a cleaner share URL (e.g., metrodle.com.br or yancouto.github.io/metrodlesp/)
 	const prettyUrl = `#metrodlesp ${url.replace(/^https?:\/\//, '')}`;
@@ -125,6 +126,11 @@ export function buildShare(
 
 // Compute an 8-direction Unicode arrow from A->B based on geographic coordinates.
 // Returns '' if any coordinate is missing/invalid.
+export function getDailyRotation(dateKey: string): number {
+	const prng = aleaPRNG('rotation:' + dateKey);
+	return Math.floor(prng.range(1, 360));
+}
+
 export function directionArrowSymbol(
 	from: { lat?: number; lon?: number },
 	to: { lat?: number; lon?: number }

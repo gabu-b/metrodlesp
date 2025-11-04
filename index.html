@@ -52,6 +52,7 @@
     <h1>Metrodle SP <span class="tagline">Que estação é essa?</span></h1>
     <div class="actions">
       <button id="statsBtn" aria-label="Stats">📊</button>
+      <button id="hardModeBtn" aria-label="Hard mode">😈</button>
       <button id="helpBtn" aria-label="Help">❔</button>
     </div>
   </header>
@@ -61,6 +62,7 @@
       <div id="mapImage" class="map-image" role="img" aria-label="Mapa da estação do dia (sem nomes)">
         <div class="placeholder">Mapa da estação (placeholder)</div>
       </div>
+      <div id="map-indicators" class="map-indicators"></div>
       <div id="suggestions" class="suggestions" aria-live="polite"></div>
     </section>
 
@@ -132,6 +134,23 @@
     </div>
   </dialog>
 
+  <dialog id="hardModeDialog">
+    <h2>Modo Difícil</h2>
+    <p>No modo difícil, o mapa começa <strong>rotacionado</strong> e <strong>sem as linhas</strong> do metrô.</p>
+    <ul>
+      <li>Após o primeiro erro, as <strong>linhas aparecem</strong>.</li>
+      <li>Após o segundo erro, o <strong>mapa volta ao normal</strong>.</li>
+    </ul>
+    <label class="toggle-switch">
+      <input type="checkbox" id="hardModeToggle">
+      <span class="slider"></span>
+      Ativar modo difícil
+    </label>
+    <div class="dialog-actions">
+      <button id="hardModeClose">Fechar</button>
+    </div>
+  </dialog>
+
   <dialog id="statsDialog">
     <h2>Estatísticas</h2>
     <div class="stats-grid">
@@ -145,9 +164,13 @@
     <div id="nextTimer" class="next-timer" aria-live="polite"></div>
     <button id="statsShareBtn" disabled>Compartilhar resultado</button>
     <div id="statsShareMsg" class="share-msg" role="status"></div>
+    <div id="hardModeSuggestion" style="display: none; margin-top: 1rem; text-align: center;">
+      <p>Fácil demais? <a href="#" id="tryHardModeLink">Tente o modo difícil!</a></p>
+    </div>
     <button id="statsClose">Fechar</button>
   </dialog>
 
 <script type="module" src="src/index.ts"></script>
+<div id="toast-notification" class="toast"></div>
 </body>
 </html>

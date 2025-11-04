@@ -23,6 +23,7 @@
     const qLon = parseFloat(params.get('lon'));
     const qLat = parseFloat(params.get('lat'));
     const qZ = parseFloat(params.get('z'));
+    const qBearing = parseFloat(params.get('bearing'));
     const hasCenter = Number.isFinite(qLon) && Number.isFinite(qLat);
 
     const map = new maplibregl.Map({
@@ -31,7 +32,7 @@
         center: hasCenter ? [qLon, qLat] : [-46.636681, -23.599162],
         zoom: Number.isFinite(qZ) ? qZ : 17,
         pitch: 0,
-        bearing: 0,
+        bearing: Number.isFinite(qBearing) ? qBearing : 0,
         interactive: false,
         preserveDrawingBuffer: true // needed for toDataURL()
     });

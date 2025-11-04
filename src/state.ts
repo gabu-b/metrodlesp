@@ -12,7 +12,17 @@ export type Stats = { played: number; wins: number; streak: number; best: number
 
 const STORAGE_KEY = 'metrodlesp:state';
 const STATS_KEY = 'metrodlesp:stats';
+const HARD_MODE_KEY = 'metrodlesp:hardMode';
 const DEBUG_STATIONS_LOG = false;
+
+export function loadHardMode(): boolean {
+	const raw = localStorage.getItem(HARD_MODE_KEY);
+	return raw === 'true';
+}
+
+export function saveHardMode(isEnabled: boolean) {
+	localStorage.setItem(HARD_MODE_KEY, String(isEnabled));
+}
 
 export function loadState(dateKey: string, stations: Station[]): GameState {
 	if(DEBUG_STATIONS_LOG) {

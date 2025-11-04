@@ -72,6 +72,18 @@ export function searchCandidates(query: string, stations: Station[], LINES: Reco
 	return [...map.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
+export function getLineMatchSquare(guessLines: LineId[], solutionLines: LineId[]): string {
+	const exactMatch = arrayEquals(guessLines, solutionLines);
+	if (exactMatch) {
+		return '🟩';
+	}
+	const partialMatch = guessLines.some(line => solutionLines.includes(line));
+	if (partialMatch) {
+		return '🟨';
+	}
+	return '⬛';
+}
+
 export function getKnownLineKnowledge(state: GameState, stations: Station[]): {
 	eliminated: Set<LineId>;
 	confirmed: Set<LineId>
@@ -98,7 +110,7 @@ export function buildShare(
 	const solution = stations.find(s => s.id === state.solutionId)!;
 	const rows = state.guesses.map(id => {
 		const guess = stations.find(s => s.id === id)!;
-		const matchSquares = (arrayEquals(guess.lines, solution.lines) ? '🟩' : '⬛');
+		const matchSquares = getLineMatchSquare(guess.lines, solution.lines);
 		if (guess.id === solution.id) return `${matchSquares} 🚆`;
 		const distTxt = DIST_FROM_SOLUTION.get(guess.wikidataId)!;
 		return `${matchSquares} a ${distTxt} paradas`;

@@ -14,8 +14,8 @@ export type SubmitFn = (text: string) => void;
 
 function normalize(s: string): string {
 	return s
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase();
 }
 
@@ -54,11 +54,7 @@ function nextAllowedChars(prefixRaw: string, stations: Station[], keywords: stri
 }
 
 // QWERTY layout rows
-const ROWS: string[] = [
-	'QWERTYUIOP',
-	'ASDFGHJKL',
-	'ZXCVBNM',
-];
+const ROWS: string[] = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
 
 export function initKeyboard(opts: {
 	root: HTMLElement;
@@ -69,61 +65,61 @@ export function initKeyboard(opts: {
 	onSubmit: SubmitFn;
 	onInputChanged: () => void; // caller updates suggestions/datalist/etc
 }): { update: () => void } {
-	const {root, input, getStations, getKeywords, getEnabled, onSubmit, onInputChanged} = opts;
+	const { root, input, getStations, getKeywords, getEnabled, onSubmit, onInputChanged } = opts;
 
-	root.innerHTML = '';
+	root.innerHTML = "";
 
 	// Render letter rows
 	for (const row of ROWS) {
-		const rowEl = document.createElement('div');
-		rowEl.className = 'kb-row';
+		const rowEl = document.createElement("div");
+		rowEl.className = "kb-row";
 		for (const ch of row) {
-			const btn = document.createElement('button');
-			btn.type = 'button';
-			btn.className = 'key';
+			const btn = document.createElement("button");
+			btn.type = "button";
+			btn.className = "key";
 			btn.textContent = ch;
-			btn.setAttribute('data-value', ch.toLowerCase());
-			btn.addEventListener('click', () => handleKey(ch.toLowerCase()));
+			btn.setAttribute("data-value", ch.toLowerCase());
+			btn.addEventListener("click", () => handleKey(ch.toLowerCase()));
 			rowEl.appendChild(btn);
 		}
 		root.appendChild(rowEl);
 	}
 
 	// Utility keys row (only dash and space; OK and Backspace moved to form area)
-	const utilRow = document.createElement('div');
-	utilRow.className = 'kb-row util';
+	const utilRow = document.createElement("div");
+	utilRow.className = "kb-row util";
 
-	const hyphen = document.createElement('button');
-	hyphen.type = 'button';
-	hyphen.className = 'key dash';
-	hyphen.textContent = '-';
-	hyphen.dataset.value = '-';
-	hyphen.addEventListener('click', () => handleKey('-'));
+	const hyphen = document.createElement("button");
+	hyphen.type = "button";
+	hyphen.className = "key dash";
+	hyphen.textContent = "-";
+	hyphen.dataset.value = "-";
+	hyphen.addEventListener("click", () => handleKey("-"));
 	utilRow.appendChild(hyphen);
 
-	const space = document.createElement('button');
-	space.type = 'button';
-	space.className = 'key action wide';
-	space.textContent = 'Espaço';
-	space.dataset.value = ' ';
-	space.addEventListener('click', () => handleKey(' '));
+	const space = document.createElement("button");
+	space.type = "button";
+	space.className = "key action wide";
+	space.textContent = "Espaço";
+	space.dataset.value = " ";
+	space.addEventListener("click", () => handleKey(" "));
 	utilRow.appendChild(space);
 
 	root.appendChild(utilRow);
 
 	function handleKey(val: string) {
 		// globally disabled keyboard (e.g., after game ends)
-		if (typeof getEnabled === 'function' && !getEnabled()) return;
-		if (val === 'BACKSPACE') {
+		if (typeof getEnabled === "function" && !getEnabled()) return;
+		if (val === "BACKSPACE") {
 			input.value = input.value.slice(0, -1);
 			onInputChanged();
 			api.update();
 			return;
 		}
-		if (val === 'OK') {
+		if (val === "OK") {
 			const v = input.value.trim();
 			if (v) onSubmit(v);
-			input.value = '';
+			input.value = "";
 			onInputChanged();
 			api.update();
 			return;
@@ -136,26 +132,27 @@ export function initKeyboard(opts: {
 
 	const api = {
 		update() {
-			const enabled = typeof getEnabled === 'function' ? getEnabled() : true;
+			const enabled = typeof getEnabled === "function" ? getEnabled() : true;
 			const stations = getStations();
-			const keywords = typeof getKeywords === 'function' ? getKeywords() ?? [] : [];
-			const allowed = enabled && input.value.length > 0 ? nextAllowedChars(input.value, stations, keywords) : new Set<string>();
-			const buttons = Array.from(root.querySelectorAll('button.key')) as HTMLButtonElement[];
+			const keywords = typeof getKeywords === "function" ? (getKeywords() ?? []) : [];
+			const allowed =
+				enabled && input.value.length > 0 ? nextAllowedChars(input.value, stations, keywords) : new Set<string>();
+			const buttons = Array.from(root.querySelectorAll("button.key")) as HTMLButtonElement[];
 			for (const b of buttons) {
-				const v = b.getAttribute('data-value')!;
+				const v = b.getAttribute("data-value")!;
 				if (!enabled) {
-					b.dataset.disabled = 'true';
+					b.dataset.disabled = "true";
 					continue;
 				}
-				if (v === 'BACKSPACE' || v === 'OK') {
-					b.dataset.disabled = 'false';
+				if (v === "BACKSPACE" || v === "OK") {
+					b.dataset.disabled = "false";
 					continue;
 				}
 				const isAllowed = input.value.length === 0 ? true : allowed.has(v);
-				b.dataset.disabled = isAllowed ? 'false' : 'true';
+				b.dataset.disabled = isAllowed ? "false" : "true";
 				b.disabled = false; // keep clickable; visually indicate via data-disabled
 			}
-		}
+		},
 	};
 
 	// initial state

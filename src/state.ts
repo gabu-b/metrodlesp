@@ -1,23 +1,30 @@
-import type {Station} from './stationLoader.js';
-import {pickDailyStation} from './logic.js';
+import type { Station } from "./stationLoader.js";
+import { pickDailyStation } from "./logic.js";
 
 export type GameState = {
 	solutionId: string;
 	dateKey: string;
 	guesses: string[]; // station ids
-	status: 'playing' | 'won' | 'lost';
+	status: "playing" | "won" | "lost";
 };
 
-export type Stats = { played: number; wins: number; streak: number; best: number; lastDate?: string; dist: number[] };
+export type Stats = {
+	played: number;
+	wins: number;
+	streak: number;
+	best: number;
+	lastDate?: string;
+	dist: number[];
+};
 
-const STORAGE_KEY = 'metrodlesp:state';
-const STATS_KEY = 'metrodlesp:stats';
-const HARD_MODE_KEY = 'metrodlesp:hardMode';
+const STORAGE_KEY = "metrodlesp:state";
+const STATS_KEY = "metrodlesp:stats";
+const HARD_MODE_KEY = "metrodlesp:hardMode";
 const DEBUG_STATIONS_LOG = false;
 
 export function loadHardMode(): boolean {
 	const raw = localStorage.getItem(HARD_MODE_KEY);
-	return raw === 'true';
+	return raw === "true";
 }
 
 export function saveHardMode(isEnabled: boolean) {
@@ -25,7 +32,7 @@ export function saveHardMode(isEnabled: boolean) {
 }
 
 export function loadState(dateKey: string, stations: Station[]): GameState {
-	if(DEBUG_STATIONS_LOG) {
+	if (DEBUG_STATIONS_LOG) {
 		if (stations && stations.length) {
 			const today = new Date(dateKey);
 			for (let i = 0; i < 30; i++) {
@@ -36,7 +43,7 @@ export function loadState(dateKey: string, stations: Station[]): GameState {
 					const station = pickDailyStation(debugDateKey, stations);
 					console.log(debugDateKey, station?.name, station?.id);
 				} catch (e) {
-					console.log(debugDateKey, 'ERROR', e);
+					console.log(debugDateKey, "ERROR", e);
 				}
 			}
 		}
@@ -50,10 +57,14 @@ export function loadState(dateKey: string, stations: Station[]): GameState {
 			if (state.dateKey === dateKey && state.solutionId === solution.id) {
 				return state;
 			}
-		} catch {
-		}
+		} catch {}
 	}
-	const init: GameState = {solutionId: solution.id, dateKey, guesses: [], status: 'playing'};
+	const init: GameState = {
+		solutionId: solution.id,
+		dateKey,
+		guesses: [],
+		status: "playing",
+	};
 	saveState(init);
 	return init;
 }
@@ -64,11 +75,11 @@ export function saveState(s: GameState) {
 
 export function loadStats(): Stats {
 	const raw = localStorage.getItem(STATS_KEY);
-	if (!raw) return {played: 0, wins: 0, streak: 0, best: 0, dist: [0, 0, 0, 0, 0, 0]};
+	if (!raw) return { played: 0, wins: 0, streak: 0, best: 0, dist: [0, 0, 0, 0, 0, 0] };
 	try {
 		return JSON.parse(raw) as Stats;
 	} catch {
-		return {played: 0, wins: 0, streak: 0, best: 0, dist: [0, 0, 0, 0, 0, 0]};
+		return { played: 0, wins: 0, streak: 0, best: 0, dist: [0, 0, 0, 0, 0, 0] };
 	}
 }
 

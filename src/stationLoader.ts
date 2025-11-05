@@ -63,14 +63,14 @@ async function parseCSVObjects(text: string): Promise<Record<string, string>[]> 
 	// Simple inline CSV parsing: split by lines and commas. Assumes no commas inside fields.
 	const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
 	if (lines.length === 0) return [];
-	const headers = lines[0].split(',').map(h => h.trim());
+	const headers = lines[0].split(",").map(h => h.trim());
 	const rows: Record<string, string>[] = [];
 	for (let i = 1; i < lines.length; i++) {
-		const cols = lines[i].split(',');
+		const cols = lines[i].split(",");
 		if (cols.length === 0) continue;
 		const obj: Record<string, string> = {};
 		for (let c = 0; c < headers.length; c++) {
-			obj[headers[c]] = (cols[c] ?? '').trim();
+			obj[headers[c]] = (cols[c] ?? "").trim();
 		}
 		rows.push(obj);
 	}
@@ -79,21 +79,19 @@ async function parseCSVObjects(text: string): Promise<Record<string, string>[]> 
 
 function slugify(ptName: string): string {
 	return ptName
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/(^-|-$)/g, '');
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/(^-|-$)/g, "");
 }
 
-const IGNORED_LINES = new Set([
-	"Ramal de São Paulo",
-]);
+const IGNORED_LINES = new Set(["Ramal de São Paulo"]);
 
 function normalizeLineLabel(label: string): LineId | undefined {
 	const raw = label
-		.replace(/\u2013|\u2014|–|—/g, '-')
-		.replace(/linha\s*/i, '')
+		.replace(/\u2013|\u2014|–|—/g, "-")
+		.replace(/linha\s*/i, "")
 		.trim();
 	// try to extract leading number
 	const m = raw.match(/^(\d{1,2})\b/);
@@ -108,7 +106,7 @@ function parsePoint(s: string): { lon: number; lat: number } | null {
 	// Expected format: Point(lon lat)
 	const m = s.match(/Point\(([-0-9.]+)\s+([-0-9.]+)\)/);
 	if (!m) return null;
-	return {lon: Number(m[1]), lat: Number(m[2])};
+	return { lon: Number(m[1]), lat: Number(m[2]) };
 }
 
 function extractQId(url: string): string {
@@ -120,9 +118,9 @@ function extractQId(url: string): string {
 
 export async function loadStations(): Promise<Station[]> {
 	if (stationsCache) return stationsCache;
-	const url = new URL('./stations.csv', import.meta.url);
-	const res = await fetch(url as any, {cache: 'no-cache'});
-	if (!res.ok) throw new Error('Falha ao carregar stations.csv');
+	const url = new URL("./stations.csv", import.meta.url);
+	const res = await fetch(url as any, { cache: "no-cache" });
+	if (!res.ok) throw new Error("Falha ao carregar stations.csv");
 	const text = await res.text();
 	const rows = await parseCSVObjects(text);
 
@@ -130,19 +128,19 @@ export async function loadStations(): Promise<Station[]> {
 
 	for (const r of rows) {
 		// Don't use station code because one station might have multiple codes
-		let name = r['stationLabel']
-			.replace(/^Estação\s+/i, '')
-			.replace(/^Terminal Intermodal\s+/i, '')
-			.replace(/\s*\(metrô\)\s*/i, '')
+		let name = r["stationLabel"]
+			.replace(/^Estação\s+/i, "")
+			.replace(/^Terminal Intermodal\s+/i, "")
+			.replace(/\s*\(metrô\)\s*/i, "")
 			.trim();
 		const wikidataId = extractQId(r["station"])!;
 		let entry = map.get(wikidataId);
 		if (!entry) {
-			entry = {id: wikidataId, name, lines: [] as LineId[], wikidataId};
+			entry = { id: wikidataId, name, lines: [] as LineId[], wikidataId };
 			map.set(wikidataId, entry);
 		}
 		// Parse and attach coordinates if present
-		const coordRaw = (r['coordinate_location'] || '').trim();
+		const coordRaw = (r["coordinate_location"] || "").trim();
 		if (coordRaw) {
 			const pt = parsePoint(coordRaw);
 			if (pt) {
@@ -150,7 +148,7 @@ export async function loadStations(): Promise<Station[]> {
 				entry.lat = pt.lat;
 			}
 		}
-		const lab = (r['connecting_lineLabel'] || '').trim();
+		const lab = (r["connecting_lineLabel"] || "").trim();
 		if (lab) {
 			const mapped = normalizeLineLabel(lab);
 			if (!mapped) continue;
@@ -166,17 +164,19 @@ export async function loadStations(): Promise<Station[]> {
 
 // Based on wikidata ids
 // interchanges are 0-cost transfers
-export type AdjacencyGraph = { adjacent: Map<string, Set<string>>, interchange: Map<string, Set<string>> };
+export type AdjacencyGraph = {
+	adjacent: Map<string, Set<string>>;
+	interchange: Map<string, Set<string>>;
+};
 let adjCache: AdjacencyGraph | null = null;
-
 
 export async function loadAdjacencyGraph(): Promise<AdjacencyGraph> {
 	if (adjCache === null) {
-		const adjUrl = new URL('./adjacencies.csv', import.meta.url);
-		const interUrl = new URL('./interchanges.csv', import.meta.url);
+		const adjUrl = new URL("./adjacencies.csv", import.meta.url);
+		const interUrl = new URL("./interchanges.csv", import.meta.url);
 		adjCache = {
-			adjacent: await loadAdjacencyCsv(adjUrl, 'station', 'adjacent_station'),
-			interchange: await loadAdjacencyCsv(interUrl, 'station', 'interchange_station')
+			adjacent: await loadAdjacencyCsv(adjUrl, "station", "adjacent_station"),
+			interchange: await loadAdjacencyCsv(interUrl, "station", "interchange_station"),
 		};
 	}
 
@@ -184,8 +184,8 @@ export async function loadAdjacencyGraph(): Promise<AdjacencyGraph> {
 }
 
 export async function loadAdjacencyCsv(url: URL, a: string, b: string): Promise<Map<string, Set<string>>> {
-	const res = await fetch(url, {cache: 'no-cache'});
-	if (!res.ok) throw new Error('Falha ao carregar adjacencies.csv');
+	const res = await fetch(url, { cache: "no-cache" });
+	if (!res.ok) throw new Error("Falha ao carregar adjacencies.csv");
 	const text = await res.text();
 	const rows = await parseCSVObjects(text);
 	const graph = new Map();
@@ -195,8 +195,7 @@ export async function loadAdjacencyCsv(url: URL, a: string, b: string): Promise<
 		graph.get(a)!.add(b);
 	}
 
-	for (const r of rows)
-		addEdge(extractQId(r[a]), extractQId(r[b]));
+	for (const r of rows) addEdge(extractQId(r[a]), extractQId(r[b]));
 	return graph;
 }
 
@@ -239,4 +238,3 @@ export function bfsDistances(start: Station, graph: AdjacencyGraph): Map<string,
 	}
 	return dist;
 }
-

@@ -1,131 +1,130 @@
 <!-- map.html (not part of the game; a generator page) -->
 <!doctype html>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-    html, body, #map {
-        margin: 0;
-        height: 100%;
-        width: 100%;
-        background: #111;
-    }
+	html,
+	body,
+	#map {
+		margin: 0;
+		height: 100%;
+		width: 100%;
+		background: #111;
+	}
 </style>
-<link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet"/>
+<link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
 <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 <div id="map"></div>
 <script>
-    const WIDTH = 512, HEIGHT = 512; // or 640x640
-    const MAPTILER_KEY = new URLSearchParams(location.search).get('k');
-    const styleUrl = `https://api.maptiler.com/maps/basic/style.json?key=${MAPTILER_KEY}`;
+	const WIDTH = 512,
+		HEIGHT = 512; // or 640x640
+	const MAPTILER_KEY = new URLSearchParams(location.search).get("k");
+	const styleUrl = `https://api.maptiler.com/maps/basic/style.json?key=${MAPTILER_KEY}`;
 
-    // Read center from URL query params if provided
-    const params = new URLSearchParams(location.search);
-    const qLon = parseFloat(params.get('lon'));
-    const qLat = parseFloat(params.get('lat'));
-    const qZ = parseFloat(params.get('z'));
-    const qBearing = parseFloat(params.get('bearing'));
-    const hasCenter = Number.isFinite(qLon) && Number.isFinite(qLat);
+	// Read center from URL query params if provided
+	const params = new URLSearchParams(location.search);
+	const qLon = parseFloat(params.get("lon"));
+	const qLat = parseFloat(params.get("lat"));
+	const qZ = parseFloat(params.get("z"));
+	const qBearing = parseFloat(params.get("bearing"));
+	const hasCenter = Number.isFinite(qLon) && Number.isFinite(qLat);
 
-    const map = new maplibregl.Map({
-        container: 'map',
-        style: styleUrl,
-        center: hasCenter ? [qLon, qLat] : [-46.636681, -23.599162],
-        zoom: Number.isFinite(qZ) ? qZ : 17,
-        pitch: 0,
-        bearing: Number.isFinite(qBearing) ? qBearing : 0,
-        interactive: false,
-        preserveDrawingBuffer: true // needed for toDataURL()
-    });
+	const map = new maplibregl.Map({
+		container: "map",
+		style: styleUrl,
+		center: hasCenter ? [qLon, qLat] : [-46.636681, -23.599162],
+		zoom: Number.isFinite(qZ) ? qZ : 17,
+		pitch: 0,
+		bearing: Number.isFinite(qBearing) ? qBearing : 0,
+		interactive: false,
+		preserveDrawingBuffer: true, // needed for toDataURL()
+	});
 
-    const myGeoJSON = {
-        type: 'FeatureCollection',
-        features: [
-            {type: 'Feature', properties: {name: 'Demo'}, geometry: {type: 'Point', coordinates: [-46.6367, -23.5992]}}
-        ]
-    };
-    const dataUrl = params.get('lines');
-    const geojson = fetch(dataUrl).then(r => r.json()).then(geojson =>
-        map.on('load', () => {
-            // Base lines layer
-            map.addSource('custom-geojson', {type: 'geojson', data: geojson});
-            map.addLayer({
-                id: 'custom-lines',
-                type: 'line',
-                source: 'custom-geojson',
-                filter: ['==', ['geometry-type'], 'LineString'], // or ['in', ['geometry-type'], ['literal', ['LineString','MultiLineString']]]
-                paint: {
-                    'line-color': '#8a8a8a',
-                    'line-width': 3,
-                    'line-opacity': 1.0
-                }
-            });
+	const myGeoJSON = {
+		type: "FeatureCollection",
+		features: [
+			{ type: "Feature", properties: { name: "Demo" }, geometry: { type: "Point", coordinates: [-46.6367, -23.5992] } },
+		],
+	};
+	const dataUrl = params.get("lines");
+	const geojson = fetch(dataUrl)
+		.then(r => r.json())
+		.then(geojson =>
+			map.on("load", () => {
+				// Base lines layer
+				map.addSource("custom-geojson", { type: "geojson", data: geojson });
+				map.addLayer({
+					id: "custom-lines",
+					type: "line",
+					source: "custom-geojson",
+					filter: ["==", ["geometry-type"], "LineString"], // or ['in', ['geometry-type'], ['literal', ['LineString','MultiLineString']]]
+					paint: {
+						"line-color": "#8a8a8a",
+						"line-width": 3,
+						"line-opacity": 1.0,
+					},
+				});
 
-            // Add a center-point source and circle layer to highlight the target location
-            map.addSource('center-point', {
-                type: 'geojson',
-                data: {
-                    type: 'FeatureCollection',
-                    features: []
-                }
-            });
-            map.addLayer({
-                id: 'center-circle',
-                type: 'circle',
-                source: 'center-point',
-                paint: {
-                    // semi-transparent fill with a bright white stroke so it stands out
-                    'circle-radius': 8,
-                    'circle-color': 'rgba(0,0,0,0.67)',
-                    'circle-stroke-color': '#fff',
-                    'circle-stroke-width': 2
-                }
-            });
+				// Add a center-point source and circle layer to highlight the target location
+				map.addSource("center-point", {
+					type: "geojson",
+					data: {
+						type: "FeatureCollection",
+						features: [],
+					},
+				});
+				map.addLayer({
+					id: "center-circle",
+					type: "circle",
+					source: "center-point",
+					paint: {
+						// semi-transparent fill with a bright white stroke so it stands out
+						"circle-radius": 8,
+						"circle-color": "rgba(0,0,0,0.67)",
+						"circle-stroke-color": "#fff",
+						"circle-stroke-width": 2,
+					},
+				});
 
-            // Initialize the center circle with provided query params or current center
-            const has = Number.isFinite(qLon) && Number.isFinite(qLat);
-            const center = has ? [qLon, qLat] : map.getCenter().toArray();
-            const src = map.getSource('center-point');
-            if (src) {
-                src.setData({
-                    type: 'FeatureCollection',
-                    features: [
-                        {type: 'Feature', properties: {}, geometry: {type: 'Point', coordinates: center}}
-                    ]
-                });
-            }
-        })
-    );
+				// Initialize the center circle with provided query params or current center
+				const has = Number.isFinite(qLon) && Number.isFinite(qLat);
+				const center = has ? [qLon, qLat] : map.getCenter().toArray();
+				const src = map.getSource("center-point");
+				if (src) {
+					src.setData({
+						type: "FeatureCollection",
+						features: [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: center } }],
+					});
+				}
+			}),
+		);
 
+	function hideNames() {
+		const style = map.getStyle();
+		for (const layer of style.layers) {
+			// Hide all text/icons
+			if (layer.type === "symbol") map.setLayoutProperty(layer.id, "visibility", "none");
+		}
+	}
 
-    function hideNames() {
-        const style = map.getStyle();
-        for (const layer of style.layers) {
-            // Hide all text/icons
-            if (layer.type === 'symbol')
-                map.setLayoutProperty(layer.id, 'visibility', 'none');
-        }
-    }
+	map.on("styledata", () => {
+		hideNames();
+	});
 
-    map.on('styledata', () => {
-        hideNames();
-    });
-
-    window.renderCentered = async function (lon, lat, zoom = 15) {
-        return new Promise((resolve) => {
-            map.once('idle', () => {
-                resolve(map.getCanvas().toDataURL('image/png'));
-            });
-            // Update center circle position if the layer/source exist
-            const src = map.getSource && map.getSource('center-point');
-            if (src && src.setData) {
-                src.setData({
-                    type: 'FeatureCollection',
-                    features: [
-                        {type: 'Feature', properties: {}, geometry: {type: 'Point', coordinates: [lon, lat]}}
-                    ]
-                });
-            }
-            map.jumpTo({center: [lon, lat], zoom});
-        });
-    };
+	window.renderCentered = async function (lon, lat, zoom = 15) {
+		return new Promise(resolve => {
+			map.once("idle", () => {
+				resolve(map.getCanvas().toDataURL("image/png"));
+			});
+			// Update center circle position if the layer/source exist
+			const src = map.getSource && map.getSource("center-point");
+			if (src && src.setData) {
+				src.setData({
+					type: "FeatureCollection",
+					features: [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [lon, lat] } }],
+				});
+			}
+			map.jumpTo({ center: [lon, lat], zoom });
+		});
+	};
 </script>

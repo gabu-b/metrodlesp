@@ -1,180 +1,214 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-  <link rel="icon" type="image/png" href="/favicon.ico">
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Metrodle SP</title>
-  <!-- Basic description for search engines and link previews -->
-  <meta name="description" content="Metrodle SP: adivinhe a estação do metrô de São Paulo em até 6 tentativas."/>
-  <!-- Open Graph for rich link previews -->
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Metrodle SP — Jogo diário do metrô de São Paulo</title>
-  <!-- Meta SEO básica -->
-  <meta name="description"
-        content="Adivinhe a estação do metrô de São Paulo em até 6 tentativas. Desafio diário com mapa, dicas e compartilhamento."/>
-  <link rel="canonical" href="https://metrodle.com.br/"/>
+	<head>
+		<link rel="icon" type="image/png" href="/favicon.ico" />
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+		<title>Metrodle SP</title>
+		<!-- Basic description for search engines and link previews -->
+		<meta name="description" content="Metrodle SP: adivinhe a estação do metrô de São Paulo em até 6 tentativas." />
+		<!-- Open Graph for rich link previews -->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Metrodle SP — Jogo diário do metrô de São Paulo</title>
+		<!-- Meta SEO básica -->
+		<meta
+			name="description"
+			content="Adivinhe a estação do metrô de São Paulo em até 6 tentativas. Desafio diário com mapa, dicas e compartilhamento."
+		/>
+		<link rel="canonical" href="https://metrodle.com.br/" />
 
-  <!-- Open Graph -->
-  <meta property="og:type" content="website"/>
-  <meta property="og:site_name" content="Metrodle SP"/>
-  <meta property="og:title" content="Metrodle SP — Jogo diário do metrô de São Paulo"/>
-  <meta property="og:description"
-        content="Você consegue acertar a estação de hoje? Jogue o desafio diário com mapa e dicas."/>
-  <meta property="og:url" content="https://metrodle.com.br/"/>
-  <meta property="og:image" content="https://metrodle.com.br/logo.png"/>
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Metrodle SP" />
+		<meta property="og:title" content="Metrodle SP — Jogo diário do metrô de São Paulo" />
+		<meta
+			property="og:description"
+			content="Você consegue acertar a estação de hoje? Jogue o desafio diário com mapa e dicas."
+		/>
+		<meta property="og:url" content="https://metrodle.com.br/" />
+		<meta property="og:image" content="https://metrodle.com.br/logo.png" />
 
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image"/>
-  <meta name="twitter:title" content="Metrodle SP — Jogo diário do metrô de São Paulo"/>
-  <meta name="twitter:description" content="Adivinhe a estação do metrô de São Paulo em até 6 tentativas."/>
-  <meta name="twitter:image" content="https://metrodle.com.br/logo.png"/>
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Metrodle SP — Jogo diário do metrô de São Paulo" />
+		<meta name="twitter:description" content="Adivinhe a estação do metrô de São Paulo em até 6 tentativas." />
+		<meta name="twitter:image" content="https://metrodle.com.br/logo.png" />
 
-  <link rel="manifest" href="manifest.webmanifest"/>
-  <link rel="stylesheet" href="./styles.css" />
-  <meta name="theme-color" content="#111" />
-</head>
-<body>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-61X7Z80Y79"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
+		<link rel="manifest" href="manifest.webmanifest" />
+		<link rel="stylesheet" href="./styles.css" />
+		<meta name="theme-color" content="#111" />
+	</head>
+	<body>
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-61X7Z80Y79"></script>
+		<script>
+			window.dataLayer = window.dataLayer || [];
 
-  function gtag() {
-    dataLayer.push(arguments);
-  }
+			function gtag() {
+				dataLayer.push(arguments);
+			}
 
-  gtag('js', new Date());
+			gtag("js", new Date());
 
-  gtag('config', 'G-61X7Z80Y79');
-</script>
-  <header class="topbar">
-    <h1>Metrodle SP <span class="tagline">Que estação é essa?</span></h1>
-    <div class="actions">
-      <button id="statsBtn" aria-label="Stats">📊</button>
-      <button id="hardModeBtn" aria-label="Hard mode">😈</button>
-      <button id="helpBtn" aria-label="Help">❔</button>
-    </div>
-  </header>
+			gtag("config", "G-61X7Z80Y79");
+		</script>
+		<header class="topbar">
+			<h1>Metrodle SP <span class="tagline">Que estação é essa?</span></h1>
+			<div class="actions">
+				<button id="statsBtn" aria-label="Stats">📊</button>
+				<button id="hardModeBtn" aria-label="Hard mode">😈</button>
+				<button id="helpBtn" aria-label="Help">❔</button>
+			</div>
+		</header>
 
-  <main class="container">
-    <section class="map">
-      <div id="mapImage" class="map-image" role="img" aria-label="Mapa da estação do dia (sem nomes)">
-        <div class="placeholder">Mapa da estação (placeholder)</div>
-      </div>
-      <div id="map-indicators" class="map-indicators"></div>
-      <div id="suggestions" class="suggestions" aria-live="polite"></div>
-    </section>
+		<main class="container">
+			<section class="map">
+				<div id="mapImage" class="map-image" role="img" aria-label="Mapa da estação do dia (sem nomes)">
+					<div class="placeholder">Mapa da estação (placeholder)</div>
+				</div>
+				<div id="map-indicators" class="map-indicators"></div>
+				<div id="suggestions" class="suggestions" aria-live="polite"></div>
+			</section>
 
-    <section id="guesses" class="guesses" aria-live="polite"></section>
+			<section id="guesses" class="guesses" aria-live="polite"></section>
 
-    <section class="input-area">
-      <form id="guessForm" autocomplete="off">
-        <label for="guessInput" class="sr-only">Digite o nome da estação ou da linha</label>
-        <input id="guessInput" name="guess" type="text" placeholder="Estação ou linha..." autocomplete="off" autocapitalize="none" autocorrect="off" required />
-        <datalist id="stationsList"></datalist>
-        <div class="form-actions">
-          <button id="backspaceBtn" type="button" aria-label="Apagar">⌫</button>
-          <button id="okBtn" type="submit">Enter</button>
-        </div>
-      </form>
+			<section class="input-area">
+				<form id="guessForm" autocomplete="off">
+					<label for="guessInput" class="sr-only">Digite o nome da estação ou da linha</label>
+					<input
+						id="guessInput"
+						name="guess"
+						type="text"
+						placeholder="Estação ou linha..."
+						autocomplete="off"
+						autocapitalize="none"
+						autocorrect="off"
+						required
+					/>
+					<datalist id="stationsList"></datalist>
+					<div class="form-actions">
+						<button id="backspaceBtn" type="button" aria-label="Apagar">⌫</button>
+						<button id="okBtn" type="submit">Enter</button>
+					</div>
+				</form>
 
-      <div id="hint" class="hint"></div>
-      <div id="keyboard" class="keyboard" aria-label="Teclado virtual"></div>
-    </section>
+				<div id="hint" class="hint"></div>
+				<div id="keyboard" class="keyboard" aria-label="Teclado virtual"></div>
+			</section>
 
-    <section class="share-area" style="display:none">
-      <button id="shareBtn" disabled>Compartilhar resultado</button>
-      <div id="shareMsg" class="share-msg" role="status"></div>
-    </section>
-  </main>
+			<section class="share-area" style="display: none">
+				<button id="shareBtn" disabled>Compartilhar resultado</button>
+				<div id="shareMsg" class="share-msg" role="status"></div>
+			</section>
+		</main>
 
+		<dialog id="endDialog">
+			<h2>Concluído</h2>
+			<p id="endSummary"></p>
+			<button id="endShareBtn">Compartilhar resultado</button>
+			<div id="endShareMsg" class="share-msg" role="status"></div>
+			<button id="endCloseBtn">Fechar</button>
+		</dialog>
 
-<dialog id="endDialog">
-    <h2>Concluído</h2>
-    <p id="endSummary"></p>
-    <button id="endShareBtn">Compartilhar resultado</button>
-    <div id="endShareMsg" class="share-msg" role="status"></div>
-    <button id="endCloseBtn">Fechar</button>
-  </dialog>
+		<dialog id="helpDialog">
+			<h2>Como jogar Metrodle SP</h2>
+			<p>
+				Metrodle SP é um <strong>jogo diário do metrô de São Paulo</strong>. Todo dia há uma estação diferente para
+				adivinhar. Você tem até <strong>6 tentativas</strong>, e começa com o mapa ao redor da estação.
+			</p>
+			<ul>
+				<li>Digite o nome da <strong>estação</strong> ou da <strong>linha do metrô</strong> para buscar candidatos.</li>
+				<li>
+					Após cada palpite, veja quais <strong>linhas</strong> batem, a <strong>distância</strong> até a resposta e a
+					<strong>direção</strong> aproximada.
+				</li>
+				<li><strong>Compartilhe seu resultado</strong> ao final e desafie amigos!</li>
+			</ul>
 
-  <dialog id="helpDialog">
-    <h2>Como jogar Metrodle SP</h2>
-    <p>Metrodle SP é um <strong>jogo diário do metrô de São Paulo</strong>. Todo dia há uma estação diferente para
-      adivinhar.
-      Você tem até <strong>6 tentativas</strong>, e começa com o mapa ao redor da estação.</p>
-    <ul>
-      <li>Digite o nome da <strong>estação</strong> ou da <strong>linha do metrô</strong> para buscar candidatos.</li>
-      <li>Após cada palpite, veja quais <strong>linhas</strong> batem, a <strong>distância</strong> até a resposta e a
-        <strong>direção</strong> aproximada.
-      </li>
-      <li><strong>Compartilhe seu resultado</strong> ao final e desafie amigos!</li>
-    </ul>
+			<h3 id="linhas">Linhas do metrô cobertas</h3>
+			<p>
+				Cobrimos as principais <strong>linhas do metrô de São Paulo</strong>. As cores e nomes seguem o padrão oficial
+				para facilitar o reconhecimento.
+			</p>
 
-    <h3 id="linhas">Linhas do metrô cobertas</h3>
-    <p>Cobrimos as principais <strong>linhas do metrô de São Paulo</strong>. As cores e nomes seguem o padrão oficial
-      para facilitar o reconhecimento.</p>
+			<h3 id="faq">Perguntas frequentes (FAQ)</h3>
+			<details>
+				<summary>O jogo é gratuito?</summary>
+				<p>Sim. Basta abrir o site diariamente e jogar.</p>
+			</details>
+			<details>
+				<summary>Que horas o desafio muda?</summary>
+				<p>
+					O desafio muda à meia-noite no horário de
+					<strong>São Paulo (UTC-3)</strong>.
+				</p>
+			</details>
+			<details>
+				<summary>Posso jogar no celular?</summary>
+				<p>Sim. O site é responsivo e funciona bem em dispositivos móveis.</p>
+			</details>
 
-    <h3 id="faq">Perguntas frequentes (FAQ)</h3>
-    <details>
-      <summary>O jogo é gratuito?</summary>
-      <p>Sim. Basta abrir o site diariamente e jogar.</p>
-    </details>
-    <details>
-      <summary>Que horas o desafio muda?</summary>
-      <p>O desafio muda à meia-noite no horário de <strong>São Paulo (UTC-3)</strong>.</p>
-    </details>
-    <details>
-      <summary>Posso jogar no celular?</summary>
-      <p>Sim. O site é responsivo e funciona bem em dispositivos móveis.</p>
-    </details>
+			<div class="dialog-actions">
+				<button id="helpClose">Fechar</button>
+			</div>
+		</dialog>
 
-    <div class="dialog-actions">
-      <button id="helpClose">Fechar</button>
-    </div>
-  </dialog>
+		<dialog id="hardModeDialog">
+			<h2>Modo Difícil</h2>
+			<p>No modo difícil, o mapa começa <strong>rotacionado</strong> e <strong>sem as linhas</strong> do metrô.</p>
+			<ul>
+				<li>Após o primeiro erro, as <strong>linhas aparecem</strong>.</li>
+				<li>Após o segundo erro, o <strong>mapa volta ao normal</strong>.</li>
+			</ul>
+			<label class="toggle-switch">
+				<input type="checkbox" id="hardModeToggle" />
+				<span class="slider"></span>
+				Ativar modo difícil
+			</label>
+			<div class="dialog-actions">
+				<button id="hardModeClose">Fechar</button>
+			</div>
+		</dialog>
 
-  <dialog id="hardModeDialog">
-    <h2>Modo Difícil</h2>
-    <p>No modo difícil, o mapa começa <strong>rotacionado</strong> e <strong>sem as linhas</strong> do metrô.</p>
-    <ul>
-      <li>Após o primeiro erro, as <strong>linhas aparecem</strong>.</li>
-      <li>Após o segundo erro, o <strong>mapa volta ao normal</strong>.</li>
-    </ul>
-    <label class="toggle-switch">
-      <input type="checkbox" id="hardModeToggle">
-      <span class="slider"></span>
-      Ativar modo difícil
-    </label>
-    <div class="dialog-actions">
-      <button id="hardModeClose">Fechar</button>
-    </div>
-  </dialog>
+		<dialog id="statsDialog">
+			<h2>Estatísticas</h2>
+			<div class="stats-grid">
+				<div>
+					<div id="statPlayed" class="stat">0</div>
+					<div class="stat-label">Jogos</div>
+				</div>
+				<div>
+					<div id="statWin" class="stat">0</div>
+					<div class="stat-label">Vitórias</div>
+				</div>
+				<div>
+					<div id="statStreak" class="stat">0</div>
+					<div class="stat-label">Sequência</div>
+				</div>
+				<div>
+					<div id="statBest" class="stat">0</div>
+					<div class="stat-label">Melhor</div>
+				</div>
+			</div>
+			<div id="guessHist" class="hist" aria-label="Distribuição de vitórias por tentativas"></div>
+			<p id="statsSummary"></p>
+			<div id="nextTimer" class="next-timer" aria-live="polite"></div>
+			<div class="dialog-actions">
+				<button id="statsShareBtn" disabled>Compartilhar resultado</button>
+				<button id="statsShareImgBtn" disabled>Compartilhar como imagem</button>
+			</div>
+			<div id="statsShareMsg" class="share-msg" role="status"></div>
+			<div id="hardModeSuggestion" style="display: none; margin-top: 1rem; text-align: center">
+				<p>
+					Fácil demais?
+					<a href="#" id="tryHardModeLink">Tente o modo difícil!</a>
+				</p>
+			</div>
+			<button id="statsClose">Fechar</button>
+		</dialog>
 
-  <dialog id="statsDialog">
-    <h2>Estatísticas</h2>
-    <div class="stats-grid">
-      <div><div id="statPlayed" class="stat">0</div><div class="stat-label">Jogos</div></div>
-      <div><div id="statWin" class="stat">0</div><div class="stat-label">Vitórias</div></div>
-      <div><div id="statStreak" class="stat">0</div><div class="stat-label">Sequência</div></div>
-      <div><div id="statBest" class="stat">0</div><div class="stat-label">Melhor</div></div>
-    </div>
-    <div id="guessHist" class="hist" aria-label="Distribuição de vitórias por tentativas"></div>
-    <p id="statsSummary"></p>
-    <div id="nextTimer" class="next-timer" aria-live="polite"></div>
-    <div class="dialog-actions">
-        <button id="statsShareBtn" disabled>Compartilhar resultado</button>
-        <button id="statsShareImgBtn" disabled>Compartilhar como imagem</button>
-    </div>
-    <div id="statsShareMsg" class="share-msg" role="status"></div>
-    <div id="hardModeSuggestion" style="display: none; margin-top: 1rem; text-align: center;">
-      <p>Fácil demais? <a href="#" id="tryHardModeLink">Tente o modo difícil!</a></p>
-    </div>
-    <button id="statsClose">Fechar</button>
-  </dialog>
-
-<script type="module" src="src/index.ts"></script>
-<div id="share-image-container" style="position: absolute; top: -9999px; left: -9999px;"></div>
-<div id="toast-notification" class="toast"></div>
-</body>
+		<script type="module" src="src/index.ts"></script>
+		<div id="share-image-container" style="position: absolute; top: -9999px; left: -9999px"></div>
+		<div id="toast-notification" class="toast"></div>
+	</body>
 </html>

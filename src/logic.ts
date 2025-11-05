@@ -1,7 +1,7 @@
-import type {Station} from './stationLoader.js';
-import type {Line, LineId} from './lines.js';
-import type {GameState} from './state.js';
-import { AleaPRNG, aleaPRNG } from './aleaPRNG.js';
+import type { Station } from "./stationLoader.js";
+import type { Line, LineId } from "./lines.js";
+import type { GameState } from "./state.js";
+import { AleaPRNG, aleaPRNG } from "./aleaPRNG.js";
 
 function oldHashString(s: string): number {
 	let h = 2166136261 >>> 0;
@@ -14,8 +14,8 @@ function oldHashString(s: string): number {
 
 export function normalize(s: string): string {
 	return s
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
 		.toLowerCase();
 }
 
@@ -45,7 +45,7 @@ export function pickDailyStation(dateKey: string, stations: Station[]): Station 
 			}
 			return a;
 		}
-		
+
 		const shuffled = shuffleArray(stations, prng);
 		return shuffled[idxInCycle];
 	} else if (dateKey >= "2025-10-25") {
@@ -62,7 +62,7 @@ export function searchCandidates(query: string, stations: Station[], LINES: Reco
 	if (!qn) return [];
 	const byName = stations.filter(s => normalize(s.name).includes(qn));
 	const lineHits: Set<LineId> = new Set();
-	(Object.keys(LINES) as LineId[]).forEach((k) => {
+	(Object.keys(LINES) as LineId[]).forEach(k => {
 		const l = LINES[k];
 		if (normalize(l.name).includes(qn) || normalize(String(l.id)).includes(qn)) lineHits.add(l.id);
 	});
@@ -75,18 +75,21 @@ export function searchCandidates(query: string, stations: Station[], LINES: Reco
 export function getLineMatchSquare(guessLines: LineId[], solutionLines: LineId[]): string {
 	const exactMatch = arrayEquals(guessLines, solutionLines);
 	if (exactMatch) {
-		return '🟩';
+		return "🟩";
 	}
 	const partialMatch = guessLines.some(line => solutionLines.includes(line));
 	if (partialMatch) {
-		return '🟨';
+		return "🟨";
 	}
-	return '⬛';
+	return "⬛";
 }
 
-export function getKnownLineKnowledge(state: GameState, stations: Station[]): {
+export function getKnownLineKnowledge(
+	state: GameState,
+	stations: Station[],
+): {
 	eliminated: Set<LineId>;
-	confirmed: Set<LineId>
+	confirmed: Set<LineId>;
 } {
 	const eliminated = new Set<LineId>();
 	const confirmed = new Set<LineId>();
@@ -95,13 +98,13 @@ export function getKnownLineKnowledge(state: GameState, stations: Station[]): {
 		const g = stations.find(s => s.id === gid)!;
 		for (const l of g.lines) {
 			if (solution.lines.includes(l)) {
-                confirmed.add(l);
-            } else {
-                eliminated.add(l);
-            }
+				confirmed.add(l);
+			} else {
+				eliminated.add(l);
+			}
 		}
 	}
-	return {eliminated, confirmed};
+	return { eliminated, confirmed };
 }
 
 export function buildShare(
@@ -119,12 +122,12 @@ export function buildShare(
 		const distTxt = DIST_FROM_SOLUTION.get(guess.wikidataId)!;
 		return `${matchSquares} a ${distTxt} paradas`;
 	});
-	const attempts = state.status === 'won' ? state.guesses.length : 'X';
-	const title = `Metrodle SP ${state.dateKey}${hardMode ? ' (difícil)' : ''}`;
-	const url = new URL('./', window.location.href).toString();
+	const attempts = state.status === "won" ? state.guesses.length : "X";
+	const title = `Metrodle SP ${state.dateKey}${hardMode ? " (difícil)" : ""}`;
+	const url = new URL("./", window.location.href).toString();
 	// Remove protocol for a cleaner share URL (e.g., metrodle.com.br or yancouto.github.io/metrodlesp/)
-	const prettyUrl = `#metrodlesp ${url.replace(/^https?:\/\//, '')}`;
-	return [title, ...rows, `${attempts}/6`, prettyUrl].join('\n');
+	const prettyUrl = `#metrodlesp ${url.replace(/^https?:\/\//, "")}`;
+	return [title, ...rows, `${attempts}/6`, prettyUrl].join("\n");
 }
 
 export function buildShareImageHTML(
@@ -142,14 +145,14 @@ export function buildShareImageHTML(
 		const distTxt = DIST_FROM_SOLUTION.get(guess.wikidataId)!;
 		return `<div>${matchSquares} a ${distTxt} paradas</div>`;
 	});
-	const attempts = state.status === 'won' ? state.guesses.length : 'X';
-	const title = `<h2>Metrodle SP ${state.dateKey}${hardMode ? ' (difícil)' : ''}</h2>`;
-	const url = new URL('./', window.location.href).toString().replace(/^https?:\/\//, '');
+	const attempts = state.status === "won" ? state.guesses.length : "X";
+	const title = `<h2>Metrodle SP ${state.dateKey}${hardMode ? " (difícil)" : ""}</h2>`;
+	const url = new URL("./", window.location.href).toString().replace(/^https?:\/\//, "");
 	const prettyUrl = `<div class="url">${url}</div>`;
 	return `<div class="share-image">
         <img src="/logo.png" alt="Metrodle SP Logo" class="logo">
         ${title}
-        <div class="rows">${rows.join('')}</div>
+        <div class="rows">${rows.join("")}</div>
         <div class="attempts">${attempts}/6</div>
         ${prettyUrl}
     </div>`;
@@ -158,26 +161,29 @@ export function buildShareImageHTML(
 // Compute an 8-direction Unicode arrow from A->B based on geographic coordinates.
 // Returns '' if any coordinate is missing/invalid.
 export function getDailyRotation(dateKey: string): number {
-	const prng = aleaPRNG('rotation:' + dateKey);
+	const prng = aleaPRNG("rotation:" + dateKey);
 	return Math.floor(prng.range(1, 360));
 }
 
-export function directionArrowSymbol(
-	from: { lat?: number; lon?: number },
-	to: { lat?: number; lon?: number }
-): string {
-	if (typeof from.lat !== 'number' || typeof from.lon !== 'number' || typeof to.lat !== 'number' || typeof to.lon !== 'number') return '';
-	const lat1 = from.lat * Math.PI / 180;
-	const lon1 = from.lon * Math.PI / 180;
-	const lat2 = to.lat * Math.PI / 180;
-	const lon2 = to.lon * Math.PI / 180;
+export function directionArrowSymbol(from: { lat?: number; lon?: number }, to: { lat?: number; lon?: number }): string {
+	if (
+		typeof from.lat !== "number" ||
+		typeof from.lon !== "number" ||
+		typeof to.lat !== "number" ||
+		typeof to.lon !== "number"
+	)
+		return "";
+	const lat1 = (from.lat * Math.PI) / 180;
+	const lon1 = (from.lon * Math.PI) / 180;
+	const lat2 = (to.lat * Math.PI) / 180;
+	const lon2 = (to.lon * Math.PI) / 180;
 	const dLon = lon2 - lon1;
 	const x = Math.cos(lat2) * Math.sin(dLon);
 	const y = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
-	let bearing = Math.atan2(x, y) * 180 / Math.PI; // -180..180, 0 = North
-	if (isNaN(bearing)) return '';
+	let bearing = (Math.atan2(x, y) * 180) / Math.PI; // -180..180, 0 = North
+	if (isNaN(bearing)) return "";
 	bearing = (bearing + 360) % 360; // 0..360
-	const dirs = ['↑', '↗', '→', '↘', '↓', '↙', '←', '↖'];
+	const dirs = ["↑", "↗", "→", "↘", "↓", "↙", "←", "↖"];
 	const idx = Math.round(bearing / 45) % 8;
 	return dirs[idx];
 }

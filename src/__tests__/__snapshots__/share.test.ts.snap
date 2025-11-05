@@ -1,0 +1,11 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`share image HTML structure 1`] = `
+"<div class="share-image">
+        <img src="/logo.png" alt="Metrodle SP Logo" class="logo">
+        <h2>Metrodle SP 2025-11-05</h2>
+        <div class="rows"><div>⬛ a 1 paradas</div><div>🟩 🚆</div></div>
+        <div class="attempts">2/6</div>
+        <div class="url">localhost:3000/</div>
+    </div>"
+`;

@@ -1,45 +1,13 @@
-import {readFile} from 'node:fs/promises';
-import {resolve} from 'node:path';
 
-class SimpleResponse {
-	constructor(private body: string, public ok = true) {
-	}
+import { Station } from '../stationLoader';
 
-	async text() {
-		return this.body;
-	}
-}
-
-export function installFetchMock() {
-	(globalThis as any).fetch = async (url: URL) => {
-		const csvPath = resolve(process.cwd(), 'src', url.pathname.split('/').pop()!);
-		const content = await readFile(csvPath, 'utf8');
-		return new SimpleResponse(content) as any;
-	};
-}
-
-export function installLocalStorageMock() {
-	const store = new Map<string, string>();
-	(globalThis as any).localStorage = {
-		getItem(key: string) {
-			return store.has(key) ? store.get(key)! : null;
-		},
-		setItem(key: string, value: string) {
-			store.set(key, String(value));
-		},
-		removeItem(key: string) {
-			store.delete(key);
-		},
-		clear() {
-			store.clear();
-		},
-	};
-	return store;
-}
-
-// Provide a minimal window.location for tests that depend on it
-export function installWindowLocationMock(href: string = 'https://yancouto.github.io/metrodlesp/') {
-	const loc = {href};
-	(globalThis as any).window = Object.assign((globalThis as any).window || {}, {location: loc});
-	return loc;
-}
+export const STATIONS: Station[] = [
+    { id: 'station1', name: 'Station One', lines: ['1'], wikidataId: 'Q1' },
+    { id: 'station2', name: 'Station Two', lines: ['2'], wikidataId: 'Q2' },
+    { id: 'Consolação', name: 'Consolação', lines: ['2'], wikidataId: 'Q3' },
+    { id: 'Paulista', name: 'Paulista', lines: ['4'], wikidataId: 'Q4' },
+    { id: 'Luz', name: 'Luz', lines: ['1', '4'], wikidataId: 'Q5' },
+    { id: 'República', name: 'República', lines: ['3', '4'], wikidataId: 'Q6' },
+    { id: 'Clínicas', name: 'Clínicas', lines: ['2'], wikidataId: 'Q7' },
+    { id: 'São Bento', name: 'São Bento', lines: ['1'], wikidataId: 'Q8' },
+];

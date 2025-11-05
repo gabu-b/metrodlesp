@@ -1,26 +1,16 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import {installFetchMock, installLocalStorageMock} from './testUtils.js';
-import {loadStations} from '../stationLoader.js';
-import {pickDailyStation} from '../logic.js';
 
-installFetchMock();
-installLocalStorageMock();
+import { test, expect } from 'vitest';
+import { pickDailyStation } from '../logic';
+import { STATIONS } from './testUtils';
 
-const DATES = ['2025-10-12', '2024-01-01', '2023-06-15'];
-
-test('pickDailyStation is deterministic for a given date', async () => {
-	const stations = await loadStations();
-	for (const d of DATES) {
-		const a = pickDailyStation(d, stations);
-		const b = pickDailyStation(d, stations);
-		assert.equal(a.id, b.id, `same date ${d} should yield same station`);
-	}
+test('pickDailyStation is deterministic for a given date', () => {
+    const station1 = pickDailyStation('2025-11-05', STATIONS);
+    const station2 = pickDailyStation('2025-11-05', STATIONS);
+    expect(station1).toEqual(station2);
 });
 
-test('different dates usually yield different stations', async () => {
-	const stations = await loadStations();
-	const picks = DATES.map(d => pickDailyStation(d, stations).id);
-	// Not guaranteed all unique, but should be at least 2 distinct
-	assert.ok(new Set(picks).size >= 2, 'expected at least two different stations across sample dates');
+test('different dates usually yield different stations', () => {
+    const station1 = pickDailyStation('2025-11-05', STATIONS);
+    const station2 = pickDailyStation('2025-11-06', STATIONS);
+    expect(station1).not.toEqual(station2);
 });

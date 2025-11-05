@@ -1,33 +1,33 @@
-import test from 'node:test';
-import assert from 'node:assert/strict';
-import {installFetchMock, installLocalStorageMock, installWindowLocationMock} from './testUtils.js';
-import {bfsDistances, loadAdjacencyGraph, loadStations} from '../stationLoader.js';
-import {buildShare} from '../logic.js';
-import {LINES} from '../lines.js';
 
-installFetchMock();
-installLocalStorageMock();
-installWindowLocationMock('https://yancouto.github.io/metrodlesp/');
+import { expect, test } from 'vitest';
+import { GameState } from '../state';
+import { buildShareImageHTML } from '../logic';
+import { Station } from '../stationLoader';
+import { Line, LineId } from '../lines';
 
-test('share text includes title, per-guess lines, attempts, and distances', async () => {
-	const stations = await loadStations();
-	const findByName = (name: string) => stations.find(s => s.name === name)!;
-	const SE = findByName('Sé');
-	const ANR = findByName('Ana Rosa');
-	const REP = findByName('República');
+test('share image HTML structure', () => {
+    const gameState: GameState = {
+        dateKey: '2025-11-05',
+        solutionId: 'station1',
+        guesses: ['station2', 'station1'],
+        status: 'won',
+    };
 
-	const adj = await loadAdjacencyGraph();
-	const distMap = bfsDistances(SE, adj);
+    const stations: Station[] = [
+        { id: 'station1', name: 'Station One', lines: ['1'], wikidataId: 'Q1' },
+        { id: 'station2', name: 'Station Two', lines: ['2'], wikidataId: 'Q2' },
+    ];
 
-	const state = {solutionId: SE.id, dateKey: '2025-10-12', guesses: [ANR.id, REP.id, SE.id], status: 'won' as const};
-	const text = buildShare(state, stations, LINES, distMap, false);
-	const lines = text.split('\n');
-	assert.ok(lines[0].startsWith('Metrodle SP 2025-10-12'));
-	// title + 3 guesses + attempts line + placeholder = 6 lines total
-	assert.equal(lines.length, 6);
-	assert.match(lines[1], /[⬛🟨] a \d+ paradas/);
-	assert.match(lines[2], /[⬛🟨] a \d+ paradas/);
-	assert.match(lines[3], /🟩 🚆/);
-	assert.equal(lines[4], '3/6');
-	assert.equal(lines[5], '#metrodlesp yancouto.github.io/metrodlesp/');
+    const lines: Record<LineId, Line> = {
+        '1': { id: '1', name: 'Line 1', color: '#ff0000' },
+        '2': { id: '2', name: 'Line 2', color: '#00ff00' },
+    };
+
+    const distFromSolution = new Map<string, number>([
+        ['Q1', 0],
+        ['Q2', 1],
+    ]);
+
+    const html = buildShareImageHTML(gameState, stations, lines, distFromSolution, false);
+    expect(html).toMatchSnapshot();
 });

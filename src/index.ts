@@ -9,6 +9,7 @@ import {normalize} from "./logic";
 import mapUrl from './map/map.html?url';
 // @ts-ignore
 import linesUrl from './map/lines.geojson?url';
+import html2canvas from 'html2canvas';
 
 let STATIONS: Station[];
 let DIST_FROM_SOLUTION: Map<string, number>; // keyed by wikidataId
@@ -131,6 +132,57 @@ async function shareResult(state: GameState) {
 	}
 }
 
+async function shareResultAsImage(state: GameState) {
+    const container = document.getElementById('share-image-container')!;
+    container.innerHTML = logic.buildShareImageHTML(state, STATIONS, LINES, DIST_FROM_SOLUTION, hardMode);
+
+    // Add temporary styles for rendering
+    const style = document.createElement('style');
+    style.textContent = `
+        .share-image {
+            width: 320px;
+			height: 440px;
+            padding: 10px;
+            background: #050a13;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .share-image .logo {
+            width: 100%;
+            height: auto;
+        }
+        .share-image h2 {
+            font-size: 1.2rem;
+            margin: 0;
+            text-align: center;
+        }
+        .share-image .rows {
+            font-size: 1.1rem;
+        }
+        .share-image .url {
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+    `;
+    document.head.appendChild(style);
+
+    const canvas = await html2canvas(container.firstElementChild as HTMLElement, {
+        useCORS: true,
+        backgroundColor: '#050a13'
+    });
+
+    document.head.removeChild(style); // Clean up styles
+    container.innerHTML = ''; // Clean up container
+
+    return new Promise<Blob | null>((resolve) => {
+        canvas.toBlob(resolve, 'image/png');
+    });
+}
+
 // Rendering and interactions
 let gameState: GameState;
 let stats: Stats;
@@ -149,6 +201,7 @@ const okBtn = document.getElementById('okBtn') as HTMLButtonElement | null;
 // Completion UI will be shown inside the stats dialog
 const statsSummary = document.getElementById('statsSummary') as HTMLParagraphElement | null;
 const statsShareBtn = document.getElementById('statsShareBtn') as HTMLButtonElement | null;
+const statsShareImgBtn = document.getElementById('statsShareImgBtn') as HTMLButtonElement | null;
 const statsShareMsg = document.getElementById('statsShareMsg') as HTMLDivElement | null;
 const nextTimerEl = document.getElementById('nextTimer') as HTMLDivElement | null;
 
@@ -255,6 +308,9 @@ function renderStats() {
 	}
 	if (statsShareBtn) {
 		statsShareBtn.disabled = gameState.status === 'playing';
+	}
+	if (statsShareImgBtn) {
+		statsShareImgBtn.disabled = gameState.status === 'playing';
 	}
 	// Show "Try Hard Mode" suggestion if applicable
 	if (hardModeSuggestion) {
@@ -629,6 +685,48 @@ function initUI() {
 		statsShareBtn.addEventListener('click', async () => {
 			const msg = await shareResult(gameState);
 			if (statsShareMsg) statsShareMsg.textContent = msg;
+		});
+	}
+
+	if (statsShareImgBtn) {
+		statsShareImgBtn.addEventListener('click', async () => {
+			statsShareImgBtn.disabled = true;
+			try {
+				const blob = await shareResultAsImage(gameState);
+				if (!blob) {
+					if (statsShareMsg) statsShareMsg.textContent = 'Falha ao gerar imagem.';
+					return;
+				}
+
+				let isTouch = false;
+				try {
+					isTouch = (('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0);
+				} catch {
+					isTouch = false;
+				}
+
+				if (isTouch && navigator.share) {
+					try {
+						const file = new File([blob], 'metrodle-sp-resultado.png', {type: 'image/png'});
+						await navigator.share({files: [file]});
+						if (statsShareMsg) statsShareMsg.textContent = 'Compartilhado!';
+					} catch (e) {
+						if (statsShareMsg) statsShareMsg.textContent = 'Falha ao compartilhar.';
+					}
+				} else {
+					const a = document.createElement('a');
+					const url = URL.createObjectURL(blob);
+					a.href = url;
+					a.download = `metrodle-sp-${todayKey}.png`;
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					URL.revokeObjectURL(url);
+					if (statsShareMsg) statsShareMsg.textContent = 'Baixado!';
+				}
+			} finally {
+				statsShareImgBtn.disabled = false;
+			}
 		});
 	}
 

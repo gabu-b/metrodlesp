@@ -145,9 +145,7 @@ button { cursor:pointer; }
     border-radius: 8px;
 }
 
-#statsShareBtn {
-    display: block;
-    margin: 12px auto 0;
+#statsShareBtn, #statsShareImgBtn {
     padding: 10px 16px;
     background: transparent;
     border: 1px solid #444;
@@ -155,7 +153,14 @@ button { cursor:pointer; }
     border-radius: 8px;
 }
 
-#statsShareBtn:disabled {
+.dialog-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+#statsShareBtn:disabled, #statsShareImgBtn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }

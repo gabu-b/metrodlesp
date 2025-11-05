@@ -94,8 +94,11 @@ export function getKnownLineKnowledge(state: GameState, stations: Station[]): {
 	for (const gid of state.guesses) {
 		const g = stations.find(s => s.id === gid)!;
 		for (const l of g.lines) {
-			if (solution.lines.includes(l)) confirmed.add(l);
-			else eliminated.add(l);
+			if (solution.lines.includes(l)) {
+                confirmed.add(l);
+            } else {
+                eliminated.add(l);
+            }
 		}
 	}
 	return {eliminated, confirmed};
@@ -122,6 +125,34 @@ export function buildShare(
 	// Remove protocol for a cleaner share URL (e.g., metrodle.com.br or yancouto.github.io/metrodlesp/)
 	const prettyUrl = `#metrodlesp ${url.replace(/^https?:\/\//, '')}`;
 	return [title, ...rows, `${attempts}/6`, prettyUrl].join('\n');
+}
+
+export function buildShareImageHTML(
+	state: GameState,
+	stations: Station[],
+	LINES: Record<string, Line>,
+	DIST_FROM_SOLUTION: Map<string, number>,
+	hardMode: boolean,
+): string {
+	const solution = stations.find(s => s.id === state.solutionId)!;
+	const rows = state.guesses.map(id => {
+		const guess = stations.find(s => s.id === id)!;
+		const matchSquares = getLineMatchSquare(guess.lines, solution.lines);
+		if (guess.id === solution.id) return `<div>${matchSquares} 🚆</div>`;
+		const distTxt = DIST_FROM_SOLUTION.get(guess.wikidataId)!;
+		return `<div>${matchSquares} a ${distTxt} paradas</div>`;
+	});
+	const attempts = state.status === 'won' ? state.guesses.length : 'X';
+	const title = `<h2>Metrodle SP ${state.dateKey}${hardMode ? ' (difícil)' : ''}</h2>`;
+	const url = new URL('./', window.location.href).toString().replace(/^https?:\/\//, '');
+	const prettyUrl = `<div class="url">${url}</div>`;
+	return `<div class="share-image">
+        <img src="/logo.png" alt="Metrodle SP Logo" class="logo">
+        ${title}
+        <div class="rows">${rows.join('')}</div>
+        <div class="attempts">${attempts}/6</div>
+        ${prettyUrl}
+    </div>`;
 }
 
 // Compute an 8-direction Unicode arrow from A->B based on geographic coordinates.

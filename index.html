@@ -162,7 +162,10 @@
     <div id="guessHist" class="hist" aria-label="Distribuição de vitórias por tentativas"></div>
     <p id="statsSummary"></p>
     <div id="nextTimer" class="next-timer" aria-live="polite"></div>
-    <button id="statsShareBtn" disabled>Compartilhar resultado</button>
+    <div class="dialog-actions">
+        <button id="statsShareBtn" disabled>Compartilhar resultado</button>
+        <button id="statsShareImgBtn" disabled>Compartilhar como imagem</button>
+    </div>
     <div id="statsShareMsg" class="share-msg" role="status"></div>
     <div id="hardModeSuggestion" style="display: none; margin-top: 1rem; text-align: center;">
       <p>Fácil demais? <a href="#" id="tryHardModeLink">Tente o modo difícil!</a></p>
@@ -171,6 +174,7 @@
   </dialog>
 
 <script type="module" src="src/index.ts"></script>
+<div id="share-image-container" style="position: absolute; top: -9999px; left: -9999px;"></div>
 <div id="toast-notification" class="toast"></div>
 </body>
 </html>

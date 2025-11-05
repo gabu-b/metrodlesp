@@ -81,27 +81,24 @@ function suggestionLineChipsHTML(station: Station, knowledge: { eliminated: Set<
 	return lineChipsHTML(chips);
 }
 
-async function shareResult(state: GameState) {
+// Utility: Detect if device is touch/mobile
+function isTouchDevice(): boolean {
+	try {
+		return (('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0);
+	} catch {
+		return false;
+	}
+}
+
+async function shareResult(state: GameState): Promise<string | null> {
 	const text = logic.buildShare(state, STATIONS, LINES, DIST_FROM_SOLUTION, hardMode);
 	// Analytics: share click
-	try { // @ts-ignore
-		gtag('event', 'share_click', {method: 'auto'});
-	} catch {
-	}
+	gtag('event', 'share_click', {method: 'auto'});
 	// Determine if device is touch-capable (mobile/tablet). On desktop, prefer clipboard.
-	let isTouch = false;
-	try {
-		isTouch = (('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0);
-	} catch {
-		isTouch = false;
-	}
-	if (isTouch && navigator.share) {
+	if (isTouchDevice() && navigator.share) {
 		try {
 			await navigator.share({text});
-			try { // @ts-ignore
-				gtag('event', 'share_success', {method: 'navigator-share'});
-			} catch {
-			}
+			gtag('event', 'share_success', {method: 'navigator-share'});
 			return 'Compartilhado!';
 		} catch {
 			// fall through to clipboard
@@ -109,78 +106,69 @@ async function shareResult(state: GameState) {
 	}
 	try {
 		await navigator.clipboard.writeText(text);
-		try { // @ts-ignore
-			gtag('event', 'share_success', {method: 'clipboard'});
-		} catch {
-		}
-		return 'Copiado para a área de transferência!';
+		gtag('event', 'share_success', {method: 'clipboard'});
 	} catch {
 		try {
 			await navigator.share({text});
-			try { // @ts-ignore
-				gtag('event', 'share_success', {method: 'navigator-share-fallback'});
-			} catch {
-			}
+			gtag('event', 'share_success', {method: 'navigator-share-fallback'});
 			return 'Compartilhado!';
 		} catch {
-			try { // @ts-ignore
-				gtag('event', 'share_fail');
-			} catch {
-			}
+			gtag('event', 'share_fail');
 			return "Falha ao compartilhar.";
 		}
+	}
+	return null;
+}
+
+async function shareImgResult(state: GameState): Promise<string | null> {
+	gtag('event', 'share_img_click', {method: 'auto'});
+	const blob = await shareResultAsImage(gameState);
+	if (!blob) {
+		return  'Falha ao gerar imagem.';
+	}
+
+	if (isTouchDevice() && navigator.share) {
+		try {
+			const file = new File([blob], 'metrodle-sp-resultado.png', {type: 'image/png'});
+			await navigator.share({files: [file]});
+			gtag('event', 'share_img_success', {method: 'navigator-share'});
+			return 'Compartilhado!';
+		} catch (e) {
+			gtag('event', 'share_img_fail');
+			return 'Falha ao compartilhar.';
+		}
+	} else {
+		const a = document.createElement('a');
+		const url = URL.createObjectURL(blob);
+		a.href = url;
+		a.download = `metrodle-sp-${todayKey}.png`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+		gtag('event', 'share_img_success', {method: 'download'});
+		return 'Baixado!';
 	}
 }
 
 async function shareResultAsImage(state: GameState) {
-    const container = document.getElementById('share-image-container')!;
-    container.innerHTML = logic.buildShareImageHTML(state, STATIONS, LINES, DIST_FROM_SOLUTION, hardMode);
+	const container = document.getElementById('share-image-container')!;
+	container.innerHTML = logic.buildShareImageHTML(state, STATIONS, LINES, DIST_FROM_SOLUTION, hardMode);
+	// Add a class to enable export styles
+	const shareImageEl = container.firstElementChild as HTMLElement;
+	shareImageEl.classList.add('share-image');
 
-    // Add temporary styles for rendering
-    const style = document.createElement('style');
-    style.textContent = `
-        .share-image {
-            width: 320px;
-			height: 440px;
-            padding: 10px;
-            background: #050a13;
-            color: white;
-            font-family: sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        .share-image .logo {
-            width: 100%;
-            height: auto;
-        }
-        .share-image h2 {
-            font-size: 1.2rem;
-            margin: 0;
-            text-align: center;
-        }
-        .share-image .rows {
-            font-size: 1.1rem;
-        }
-        .share-image .url {
-            font-size: 0.9rem;
-            color: #aaa;
-        }
-    `;
-    document.head.appendChild(style);
+	const canvas = await html2canvas(shareImageEl, {
+		useCORS: true,
+		backgroundColor: '#050a13'
+	});
 
-    const canvas = await html2canvas(container.firstElementChild as HTMLElement, {
-        useCORS: true,
-        backgroundColor: '#050a13'
-    });
+	// Clean up
+	container.innerHTML = '';
 
-    document.head.removeChild(style); // Clean up styles
-    container.innerHTML = ''; // Clean up container
-
-    return new Promise<Blob | null>((resolve) => {
-        canvas.toBlob(resolve, 'image/png');
-    });
+	return new Promise<Blob | null>((resolve) => {
+		canvas.toBlob(resolve, 'image/png');
+	});
 }
 
 // Rendering and interactions
@@ -226,16 +214,10 @@ const guessHistEl = document.getElementById('guessHist') as HTMLDivElement | nul
 // PWA install analytics
 try {
 	window.addEventListener('beforeinstallprompt', () => {
-		try { // @ts-ignore
-			gtag('event', 'install_prompt_shown');
-		} catch {
-		}
+		gtag('event', 'install_prompt_shown');
 	});
 	window.addEventListener('appinstalled', () => {
-		try { // @ts-ignore
-			gtag('event', 'install_accepted');
-		} catch {
-		}
+		gtag('event', 'install_accepted');
 	});
 } catch {
 }
@@ -683,8 +665,13 @@ function initUI() {
 
 	if (statsShareBtn) {
 		statsShareBtn.addEventListener('click', async () => {
-			const msg = await shareResult(gameState);
-			if (statsShareMsg) statsShareMsg.textContent = msg;
+			statsShareBtn.disabled = true;
+			try {
+				const msg = await shareResult(gameState);
+				statsShareBtn.textContent = msg;
+			} finally {
+				statsShareBtn.disabled = false;
+			}
 		});
 	}
 
@@ -692,38 +679,8 @@ function initUI() {
 		statsShareImgBtn.addEventListener('click', async () => {
 			statsShareImgBtn.disabled = true;
 			try {
-				const blob = await shareResultAsImage(gameState);
-				if (!blob) {
-					if (statsShareMsg) statsShareMsg.textContent = 'Falha ao gerar imagem.';
-					return;
-				}
-
-				let isTouch = false;
-				try {
-					isTouch = (('ontouchstart' in window) || (navigator.maxTouchPoints || 0) > 0);
-				} catch {
-					isTouch = false;
-				}
-
-				if (isTouch && navigator.share) {
-					try {
-						const file = new File([blob], 'metrodle-sp-resultado.png', {type: 'image/png'});
-						await navigator.share({files: [file]});
-						if (statsShareMsg) statsShareMsg.textContent = 'Compartilhado!';
-					} catch (e) {
-						if (statsShareMsg) statsShareMsg.textContent = 'Falha ao compartilhar.';
-					}
-				} else {
-					const a = document.createElement('a');
-					const url = URL.createObjectURL(blob);
-					a.href = url;
-					a.download = `metrodle-sp-${todayKey}.png`;
-					document.body.appendChild(a);
-					a.click();
-					document.body.removeChild(a);
-					URL.revokeObjectURL(url);
-					if (statsShareMsg) statsShareMsg.textContent = 'Baixado!';
-				}
+				const msg = await shareImgResult(gameState);
+				statsShareImgBtn.textContent = msg;
 			} finally {
 				statsShareImgBtn.disabled = false;
 			}

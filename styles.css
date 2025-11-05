@@ -177,6 +177,7 @@ button { cursor:pointer; }
 
 #statsShareMsg {
     margin-top: 6px;
+    text-align: center;
 }
 
 /* Suggestions list layout */
@@ -418,4 +419,34 @@ button:disabled {
 
 #tryHardModeLink {
     color: #58a6ff;
+}
+
+/* Share image export styles (used only for image export) */
+.share-image {
+    width: 320px;
+    height: 440px;
+    padding: 10px;
+    background: #050a13;
+    color: white;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.share-image .logo {
+    width: 100%;
+    height: auto;
+}
+.share-image h2 {
+    font-size: 1.2rem;
+    margin: 0;
+    text-align: center;
+}
+.share-image .rows {
+    font-size: 1.1rem;
+}
+.share-image .url {
+    font-size: 0.9rem;
+    color: #aaa;
 }

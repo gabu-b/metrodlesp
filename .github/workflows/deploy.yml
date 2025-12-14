@@ -21,8 +21,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Single deploy job since we're just deploying
   deploy:
+    name: Test, Build & Deploy
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -34,9 +34,11 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: lts/*
-          cache: "npm"
+          cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      - name: Typecheck & Tests
+        run: npm test
       - name: Create config file with API key
         run: echo "VITE_MAPTILER_KEY=${{ secrets.MAPTILER_KEY }}" > .env
       - name: Build

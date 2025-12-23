@@ -109,20 +109,42 @@
 			if (geojson) {
 				try {
 					map.addSource("custom-geojson", { type: "geojson", data: geojson });
+					// Base layer: solid lines.
+					// For known lines: show real color.
+					// For unknown lines: show WHITE (to form the base of the candy cane pattern).
 					map.addLayer({
-						id: "custom-lines",
+						id: "custom-lines-base",
 						type: "line",
 						source: "custom-geojson",
 						filter: ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
 						paint: {
-							// Show the real line color only for known (identified) lines; others in black
 							"line-color": [
 								"case",
 								["in", ["get", "ref"], ["literal", knownLines]],
 								["coalesce", ["get", "colour"], ["get", "color"], "#8a8a8a"],
-								"#000000",
+								"#FFFFFF", // Unknown lines are white base
 							],
-							"line-width": 3,
+							"line-width": 4, // Slightly wider base
+							"line-opacity": 1.0,
+						},
+					});
+
+					// Stripe layer: dashed lines.
+					// Only for unknown lines. Renders RED dashes over the white base.
+					map.addLayer({
+						id: "custom-lines-stripe",
+						type: "line",
+						source: "custom-geojson",
+						filter: ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
+						paint: {
+							"line-color": [
+								"case",
+								["in", ["get", "ref"], ["literal", knownLines]],
+								"transparent", // Don't stripe known lines
+								"#FF0000", // Red stripes for unknown
+							],
+							"line-width": 4,
+							"line-dasharray": [2, 2], // Candy cane dash pattern
 							"line-opacity": 1.0,
 						},
 					});
@@ -134,28 +156,34 @@
 			// ignore; already logged in overlayPromise
 		}
 
-		// Add a center-point source and circle layer to highlight the target location
-		map.addSource("center-point", {
-			type: "geojson",
-			data: {
-				type: "FeatureCollection",
-				features: [],
-			},
-		});
-		map.addLayer({
-			id: "center-circle",
-			type: "circle",
-			source: "center-point",
-			paint: {
-				// semi-transparent fill with a bright white stroke so it stands out
-				"circle-radius": 8,
-				"circle-color": "rgba(0,0,0,0.67)",
-				"circle-stroke-color": "#fff",
-				"circle-stroke-width": 2,
-			},
-		});
+  // Add a center-point source and star symbol layer to highlight the target location
+  map.addSource("center-point", {
+      type: "geojson",
+      data: {
+          type: "FeatureCollection",
+          features: [],
+      },
+  });
+  map.addLayer({
+      id: "center-star",
+      type: "symbol",
+      source: "center-point",
+      layout: {
+          // Use a Unicode star so we don't need an external image asset
+          "text-field": "★",
+          "text-size": 24,
+          "text-allow-overlap": true,
+          "text-ignore-placement": true,
+      },
+      paint: {
+          "text-color": "#FFD700", // Gold
+          "text-halo-color": "#664111", // dark halo to work on light backgrounds
+          "text-halo-width": 2,
+          "text-halo-blur": 0.5,
+      },
+  });
 
-		// Initialize the center circle with provided query params or current center
+  // Initialize the center star with provided query params or current center
 		const has = Number.isFinite(qLon) && Number.isFinite(qLat);
 		const center = has ? [qLon, qLat] : map.getCenter().toArray();
 		currentCenter = center.slice();
@@ -177,13 +205,16 @@
 		}
 	});
 
-	function hideNames() {
-		const style = map.getStyle();
-		for (const layer of style.layers) {
-			// Hide all text/icons
-			if (layer.type === "symbol") map.setLayoutProperty(layer.id, "visibility", "none");
-		}
-	}
+ function hideNames() {
+        const style = map.getStyle();
+        for (const layer of style.layers) {
+            // Hide all text/icons from the base style, but keep our custom marker visible
+            if (layer.type === "symbol") {
+                if (layer.id === "center-star") continue; // do not hide the custom center marker
+                map.setLayoutProperty(layer.id, "visibility", "none");
+            }
+        }
+    }
 
 	map.on("styledata", () => {
 		hideNames();

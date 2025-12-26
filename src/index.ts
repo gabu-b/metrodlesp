@@ -244,6 +244,11 @@ const tryHardModeLink = document.getElementById("tryHardModeLink") as HTMLAnchor
 const cptmToggle = document.getElementById("cptmToggle") as HTMLInputElement;
 const statsBtn = document.getElementById("statsBtn") as HTMLButtonElement;
 const statsClose = document.getElementById("statsClose") as HTMLButtonElement;
+
+const aboutDialog = document.getElementById("aboutDialog") as HTMLDialogElement;
+const aboutBtn = document.getElementById("aboutBtn") as HTMLAnchorElement;
+const aboutClose = document.getElementById("aboutClose") as HTMLButtonElement;
+
 const statPlayed = document.getElementById("statPlayed")!;
 const statWin = document.getElementById("statWin")!;
 const statStreak = document.getElementById("statStreak")!;
@@ -527,6 +532,7 @@ function checkIfEnded() {
 
 function setHint(text: string) {
 	hintEl.textContent = text;
+	hintEl.style.display = text.trim() ? "block" : "none";
 }
 
 function onSubmitGuess(name: string) {
@@ -682,6 +688,7 @@ function updatePlayableUI() {
 }
 
 function initUI() {
+	setHint("");
 	refreshDatalist();
 	renderGuesses();
 	renderStats();
@@ -762,6 +769,12 @@ function initUI() {
 		statsDialog.showModal();
 	});
 	statsClose.addEventListener("click", () => statsDialog.close());
+
+	aboutBtn.addEventListener("click", e => {
+		e.preventDefault();
+		aboutDialog.showModal();
+	});
+	aboutClose.addEventListener("click", () => aboutDialog.close());
 
 	// Settings dialog interactions
 	openedForCptmPrompt = false;

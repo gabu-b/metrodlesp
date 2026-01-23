@@ -6,6 +6,7 @@ body {
 	margin: 0;
 	padding: 0;
 	height: 100%;
+	overflow: hidden;
 }
 body {
 	font-family:
@@ -30,6 +31,8 @@ body {
 	top: 0;
 	background: #0f0f0f;
 	z-index: 10;
+	height: 53px;
+	flex-shrink: 0;
 }
 
 .topbar h1 {
@@ -149,10 +152,9 @@ body {
 
 .guesses {
 	margin-top: 12px;
-	margin-bottom: 12px;
+	margin-bottom: -20px;
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
 }
 .guess {
 	display: flex;
@@ -220,6 +222,7 @@ body {
 	align-items: center;
 	gap: 8px;
 	margin-top: 16px;
+	justify-content: center;
 }
 
 .footer {
@@ -388,6 +391,8 @@ dialog {
 	padding: 16px;
 	background: #171717;
 	color: #fff;
+	max-height: 90vh;
+	overflow-y: auto;
 }
 button {
 	cursor: pointer;
@@ -575,15 +580,25 @@ button {
 	/* layout for sticky input + fixed keyboard */
 	display: flex;
 	flex-direction: column;
-	min-height: 100dvh; /* account for mobile dynamic viewport */
+	height: calc(100dvh - 53px); /* Subtract topbar height (approx 53px) */
 	padding-bottom: calc(var(--kb-h) + env(safe-area-inset-bottom, 0px) + 8px);
 }
 
 /* Make the guesses area able to shrink and scroll when space is tight */
 .guesses {
 	flex: 1 1 auto;
-	overflow: auto;
+	overflow-y: auto;
 	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 24px;
+}
+
+#guesses {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
 }
 
 /* Keep the input area visible above the fixed keyboard */
@@ -597,7 +612,7 @@ button {
 
 /* (Removed max-height caps for .map-image to preserve true square on all screens) */
 
-@media (max-height: 600px) {
+@media (max-aspect-ratio: 3/4), (max-height: 700px) {
 	.guess {
 		padding: 6px;
 	}
@@ -605,6 +620,20 @@ button {
 	.line-chip {
 		width: 12px;
 		height: 12px;
+	}
+
+	:root {
+		--kb-h: 145px;
+	}
+	.key {
+		padding: 8px 4px;
+	}
+	.keyboard {
+		gap: 4px;
+		padding: 6px 12px;
+	}
+	.kb-row {
+		gap: 4px;
 	}
 }
 

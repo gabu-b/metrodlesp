@@ -75,7 +75,20 @@
 				<div id="suggestions" class="suggestions" aria-live="polite"></div>
 			</section>
 
-			<section id="guesses" class="guesses" aria-live="polite"></section>
+			<section id="guesses-container" class="guesses" aria-live="polite">
+				<div id="guesses">
+					<!-- Guesses will be injected here -->
+				</div>
+				<section class="share-area" style="display: none">
+					<button id="shareBtn" disabled>Compartilhar resultado</button>
+					<div id="shareMsg" class="share-msg" role="status"></div>
+				</section>
+				<footer class="footer">
+					<a href="#" id="aboutBtn">Sobre o jogo</a>
+					<a href="privacy.html">Privacidade</a>
+					<a href="https://x.com/MetrodleSP" target="_blank">Contato</a>
+				</footer>
+			</section>
 
 			<section class="input-area">
 				<form id="guessForm" autocomplete="off">
@@ -100,16 +113,6 @@
 				<div id="hint" class="hint"></div>
 				<div id="keyboard" class="keyboard" aria-label="Teclado virtual"></div>
 			</section>
-
-			<section class="share-area" style="display: none">
-				<button id="shareBtn" disabled>Compartilhar resultado</button>
-				<div id="shareMsg" class="share-msg" role="status"></div>
-			</section>
-			<footer class="footer">
-				<a href="#" id="aboutBtn">Sobre o jogo</a>
-				<a href="privacy.html">Privacidade</a>
-				<a href="https://x.com/MetrodleSP" target="_blank">Contato</a>
-			</footer>
 		</main>
 
 		<dialog id="endDialog">

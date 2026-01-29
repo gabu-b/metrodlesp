@@ -249,6 +249,10 @@ const aboutDialog = document.getElementById("aboutDialog") as HTMLDialogElement;
 const aboutBtn = document.getElementById("aboutBtn") as HTMLAnchorElement;
 const aboutClose = document.getElementById("aboutClose") as HTMLButtonElement;
 
+// Map fixed info dialog (shown on second open of the day)
+const mapFixedDialog = document.getElementById("mapFixedDialog") as HTMLDialogElement | null;
+const mapFixedClose = document.getElementById("mapFixedClose") as HTMLButtonElement | null;
+
 const statPlayed = document.getElementById("statPlayed")!;
 const statWin = document.getElementById("statWin")!;
 const statStreak = document.getElementById("statStreak")!;
@@ -909,6 +913,11 @@ async function boot() {
 	const solution = stationById(gameState.solutionId);
 	DIST_FROM_SOLUTION = bfsDistances(solution, ADJ_GRAPH);
 	initUI();
+
+	// Wire close button for the map-fixed dialog
+	if (mapFixedDialog && mapFixedClose) {
+		mapFixedClose.addEventListener("click", () => mapFixedDialog.close());
+	}
 	// Wire help link to open settings
 	if (openSettingsFromHelp) {
 		openSettingsFromHelp.addEventListener("click", e => {
@@ -942,6 +951,20 @@ async function boot() {
 			openedForCptmPrompt = true;
 			updateCptmHintVisibility();
 			settingsDialog.showModal();
+		}
+	} catch {}
+
+	// One-off map-fixed dialog for 2026-01-29 only (São Paulo date)
+	// Shows only if the user had already opened earlier the same day, and it hasn't been shown yet via the ad-hoc flag.
+	try {
+		if (todayKey === "2026-01-29") {
+			const adhocKey = "adhoc";
+			const adhocValue = "29-01-2026-incident"
+			const alreadyShown = localStorage.getItem(adhocKey) === adhocValue;
+			if (!alreadyShown && mapFixedDialog) {
+				mapFixedDialog.showModal();
+				localStorage.setItem(adhocKey, adhocValue);
+			}
 		}
 	} catch {}
 }

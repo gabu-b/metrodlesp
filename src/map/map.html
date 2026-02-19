@@ -28,7 +28,8 @@
 	const qZ = parseFloat(params.get("z"));
 	const qBearing = parseFloat(params.get("bearing"));
 	const hasCenter = Number.isFinite(qLon) && Number.isFinite(qLat);
-	const interact = params.get("interact") === "1";
+	let interact = params.get("interact") === "1";
+	let showLines = params.get("showLines") !== "0";
 	// Choose a default center around central SP if none provided
 	const defaultCenter = [-46.636681, -23.599162];
 	let currentCenter = hasCenter ? [qLon, qLat] : defaultCenter.slice();
@@ -62,12 +63,49 @@
 
 	const dataUrl = params.get("lines");
 	const knownParam = params.get("known");
-	const knownLines = knownParam
+	let knownLines = knownParam
 		? knownParam
 				.split(",")
 				.map(s => s.trim())
 				.filter(Boolean)
 		: [];
+
+	function setInteractionEnabled(enabled) {
+		interact = !!enabled;
+		const handlers = [
+			"boxZoom",
+			"doubleClickZoom",
+			"dragPan",
+			"dragRotate",
+			"keyboard",
+			"scrollZoom",
+			"touchZoomRotate",
+			"touchPitch",
+		];
+		for (const name of handlers) {
+			const handler = map && map[name];
+			if (!handler) continue;
+			if (interact && handler.enable) handler.enable();
+			if (!interact && handler.disable) handler.disable();
+		}
+	}
+
+	function lineColorExpression() {
+		return [
+			"case",
+			["in", ["get", "ref"], ["literal", knownLines]],
+			["coalesce", ["get", "colour"], ["get", "color"], "#8a8a8a"],
+			"#000000",
+		];
+	}
+
+	function applyOverlayState() {
+		try {
+			if (!map.getLayer("custom-lines")) return;
+			map.setLayoutProperty("custom-lines", "visibility", showLines ? "visible" : "none");
+			map.setPaintProperty("custom-lines", "line-color", lineColorExpression());
+		} catch {}
+	}
 
 	// Pre-start fetch of the overlay so it can happen in parallel with style/map load
 	const overlayPromise = (function () {
@@ -103,6 +141,7 @@
 
 	// Always set up layers on load; conditionally add lines if a data URL is provided
 	map.on("load", async () => {
+		setInteractionEnabled(interact);
 		// Add the lines overlay if it was requested and successfully fetched
 		try {
 			const geojson = await overlayPromise;
@@ -116,16 +155,12 @@
 						filter: ["match", ["geometry-type"], ["LineString", "MultiLineString"], true, false],
 						paint: {
 							// Show the real line color only for known (identified) lines; others in black
-							"line-color": [
-								"case",
-								["in", ["get", "ref"], ["literal", knownLines]],
-								["coalesce", ["get", "colour"], ["get", "color"], "#8a8a8a"],
-								"#000000",
-							],
+							"line-color": lineColorExpression(),
 							"line-width": 3,
 							"line-opacity": 1.0,
 						},
 					});
+					applyOverlayState();
 				} catch (addErr) {
 					console.warn("Failed to add lines overlay to map", addErr);
 				}
@@ -175,6 +210,12 @@
 				window.addEventListener("resize", () => applyFixedView(currentCenter, { animate: false }));
 			} catch {}
 		}
+
+		try {
+			if (window.parent && window.parent !== window) {
+				window.parent.postMessage({ type: "metrodle-map-ready" }, "*");
+			}
+		} catch {}
 	});
 
 	function hideNames() {
@@ -207,4 +248,29 @@
 			applyFixedView(currentCenter, { animate: false });
 		});
 	};
+
+	window.addEventListener("message", event => {
+		const payload = event.data;
+		if (!payload || typeof payload !== "object") return;
+		if (payload.type !== "metrodle-map-update") return;
+
+		if (typeof payload.showLines === "boolean") showLines = payload.showLines;
+		if (Array.isArray(payload.knownLines)) {
+			knownLines = payload.knownLines.map(item => String(item)).filter(Boolean);
+		}
+		if (typeof payload.interactive === "boolean") {
+			setInteractionEnabled(payload.interactive);
+		}
+		if (payload.bearing === null) {
+			try {
+				map.setBearing(0);
+			} catch {}
+		} else if (Number.isFinite(payload.bearing)) {
+			try {
+				map.setBearing(payload.bearing);
+			} catch {}
+		}
+
+		applyOverlayState();
+	});
 </script>

@@ -5,6 +5,7 @@ import * as state from "./state.js";
 import { GameState, Stats } from "./state.js";
 import * as logic from "./logic";
 import { normalize } from "./logic";
+import { buildMapIframeKey, buildMapUpdateMessage, mapParamsEqual, MapParams } from "./map/embedProtocol.js";
 // @ts-ignore
 import mapUrl from "./map/map.html?url";
 // @ts-ignore
@@ -574,11 +575,16 @@ function onSubmitGuess(name: string) {
 	if (gameState.status !== "playing") shareBtn.disabled = false;
 }
 
-type MapParams = { showLines: boolean; bearing: number | null; knownCsv: string | null };
 let lastMapParams: MapParams | null = null;
+let mapIframeEl: HTMLIFrameElement | null = null;
+let mapIframeKey: string | null = null;
+let mapIframeReady = false;
+let mapPendingParams: MapParams | null = null;
+let mapMessageListenerAttached = false;
 
 function computeMapParams(): MapParams {
 	const isWon = gameState.status === "won";
+	const isLost = gameState.status === "lost";
 	const showLines = !hardMode || gameState.guesses.length >= 2 || isWon;
 	let knownCsv: string | null = null;
 	if (showLines) {
@@ -589,62 +595,60 @@ function computeMapParams(): MapParams {
 		} catch {}
 	}
 	const bearing = hardMode && gameState.guesses.length < 4 && !isWon ? dailyRotation : null;
-	return { showLines, bearing, knownCsv };
+	const interactive = isWon || isLost || (!hardMode && gameState.guesses.length >= 5 && gameState.guesses.length < 6);
+	return { showLines, bearing, knownCsv, interactive };
 }
 
-function mapParamsEqual(a: MapParams | null, b: MapParams | null): boolean {
-	if (a === b) return true;
-	if (!a || !b) return false;
-	return a.showLines === b.showLines && a.bearing === b.bearing && a.knownCsv === b.knownCsv;
+function postMapUpdate(params: MapParams) {
+	mapPendingParams = params;
+	if (!mapIframeEl || !mapIframeReady || !mapIframeEl.contentWindow) return;
+	mapIframeEl.contentWindow.postMessage(buildMapUpdateMessage(params), "*");
 }
 
 function renderMap() {
 	const mapDiv = document.getElementById("mapImage") as HTMLDivElement;
 	const indicatorsDiv = document.getElementById("map-indicators") as HTMLDivElement;
-	mapDiv.innerHTML = ""; // Clear only the map container
 	// Determine today's solution and pass its coordinates to the embedded map
 	const solution = stationById(gameState.solutionId);
 	const isWon = gameState.status === "won";
-	const isLost = gameState.status === "lost";
+	const mapParams = computeMapParams();
 	const params = new URLSearchParams();
 	if (typeof solution.lon === "number" && typeof solution.lat === "number") {
 		params.set("lon", String(solution.lon));
 		params.set("lat", String(solution.lat));
 		params.set("z", "15"); // default zoom
 	}
-	if (!hardMode || gameState.guesses.length >= 2 || isWon) {
-		params.set("lines", linesUrl);
-		// Pass known (confirmed) line ids so only those render in color
-		try {
-			const knowledge = logic.getKnownLineKnowledge(gameState, STATIONS);
-			const known = [...knowledge.confirmed.values(), ...knowledge.eliminated.values()];
-			if (known.length) params.set("known", known.join(","));
-		} catch {}
-	}
-	if (hardMode && gameState.guesses.length < 4 && !isWon) {
-		params.set("bearing", String(dailyRotation));
-	}
-
-	// Easy mode: after 5 errors, allow the player to pan/zoom the map
-	const allowInteract = isWon || isLost || (!hardMode && gameState.guesses.length >= 5 && gameState.guesses.length < 6);
-	if (allowInteract) {
+	params.set("lines", linesUrl);
+	params.set("showLines", mapParams.showLines ? "1" : "0");
+	if (mapParams.knownCsv) params.set("known", mapParams.knownCsv);
+	if (typeof mapParams.bearing === "number") params.set("bearing", String(mapParams.bearing));
+	if (mapParams.interactive) {
 		params.set("interact", "1");
 	}
-	const iframe = document.createElement("iframe");
 	// Append MapTiler key if available via Vite env (not present in tests/build output)
 	const VITE_KEY = (import.meta as any).env.VITE_MAPTILER_KEY;
 	if (VITE_KEY) params.set("k", VITE_KEY);
+	const nextSrc = mapUrl + (params.toString() ? `?${params.toString()}` : "");
+	const nextKey = buildMapIframeKey(solution.id, linesUrl, VITE_KEY);
 
-	iframe.src = mapUrl + (params.toString() ? `?${params.toString()}` : "");
-	iframe.title = "Mapa (sem nomes)";
-	iframe.style.width = "100%";
-	iframe.style.height = "100%";
-	iframe.style.border = "0";
-	iframe.setAttribute("loading", "lazy");
-	mapDiv.appendChild(iframe);
+	if (!mapIframeEl || mapIframeKey !== nextKey) {
+		mapDiv.innerHTML = "";
+		mapIframeReady = false;
+		mapIframeEl = document.createElement("iframe");
+		mapIframeEl.src = nextSrc;
+		mapIframeEl.title = "Mapa (sem nomes)";
+		mapIframeEl.style.width = "100%";
+		mapIframeEl.style.height = "100%";
+		mapIframeEl.style.border = "0";
+		mapIframeEl.setAttribute("loading", "lazy");
+		mapDiv.appendChild(mapIframeEl);
+		mapIframeKey = nextKey;
+	}
+
+	postMapUpdate(mapParams);
 
 	// Update cached params snapshot to avoid unnecessary reloads next time
-	lastMapParams = computeMapParams();
+	lastMapParams = mapParams;
 
 	indicatorsDiv.innerHTML = "";
 	if (hardMode && !isWon) {
@@ -671,7 +675,7 @@ function renderMap() {
 	}
 
 	// Indicator for interactive map on easy mode after 5 errors
-	if (allowInteract) {
+	if (mapParams.interactive) {
 		const pan = document.createElement("div");
 		pan.className = "map-indicator";
 		pan.title = "Você pode arrastar e aproximar o mapa";
@@ -838,6 +842,19 @@ function initUI() {
 				statsShareImgBtn.disabled = false;
 			}
 		});
+	}
+
+	if (!mapMessageListenerAttached) {
+		window.addEventListener("message", event => {
+			if (!mapIframeEl || event.source !== mapIframeEl.contentWindow) return;
+			const payload = event.data;
+			if (!payload || typeof payload !== "object") return;
+			if ((payload as any).type === "metrodle-map-ready") {
+				mapIframeReady = true;
+				if (mapPendingParams) postMapUpdate(mapPendingParams);
+			}
+		});
+		mapMessageListenerAttached = true;
 	}
 
 	tryHardModeLink.addEventListener("click", e => {

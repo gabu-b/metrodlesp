@@ -954,12 +954,12 @@ async function boot() {
 		}
 	} catch {}
 
-	// One-off map-fixed dialog for 2026-01-29 only (São Paulo date)
+	// One-off map-fixed dialog for 2026-02-19 only (São Paulo date)
 	// Shows only if the user had already opened earlier the same day, and it hasn't been shown yet via the ad-hoc flag.
 	try {
-		if (todayKey === "2026-01-29") {
+		if (todayKey === "2026-02-19") {
 			const adhocKey = "adhoc";
-			const adhocValue = "29-01-2026-incident"
+			const adhocValue = "2026-02-19-incident"
 			const alreadyShown = localStorage.getItem(adhocKey) === adhocValue;
 			if (!alreadyShown && mapFixedDialog) {
 				mapFixedDialog.showModal();

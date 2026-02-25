@@ -163,6 +163,80 @@ async function assertGraphProperties(includeCPTM: boolean) {
 	}
 }
 
+/** Kosaraju's algorithm: returns array of SCCs (each SCC is a Set of node ids). */
+function findSCCs(graph: Map<string, Set<string>>): Set<string>[] {
+	const visited = new Set<string>();
+	const order: string[] = [];
+
+	// All nodes (including those only appearing as targets)
+	const allNodes = new Set<string>();
+	for (const [u, vs] of graph) {
+		allNodes.add(u);
+		for (const v of vs) allNodes.add(v);
+	}
+
+	function dfs1(u: string) {
+		visited.add(u);
+		for (const v of graph.get(u) ?? []) {
+			if (!visited.has(v)) dfs1(v);
+		}
+		order.push(u);
+	}
+
+	for (const n of allNodes) if (!visited.has(n)) dfs1(n);
+
+	// Build reversed graph
+	const rev = new Map<string, Set<string>>();
+	for (const [u, vs] of graph) {
+		for (const v of vs) {
+			if (!rev.has(v)) rev.set(v, new Set());
+			rev.get(v)!.add(u);
+		}
+	}
+
+	const visited2 = new Set<string>();
+	const sccs: Set<string>[] = [];
+
+	function dfs2(u: string, scc: Set<string>) {
+		visited2.add(u);
+		scc.add(u);
+		for (const v of rev.get(u) ?? []) {
+			if (!visited2.has(v)) dfs2(v, scc);
+		}
+	}
+
+	for (let i = order.length - 1; i >= 0; i--) {
+		const u = order[i];
+		if (!visited2.has(u)) {
+			const scc = new Set<string>();
+			dfs2(u, scc);
+			sccs.push(scc);
+		}
+	}
+
+	return sccs;
+}
+
+async function assertStronglyConnected(includeCPTM: boolean) {
+	const { g } = await loadAll(includeCPTM);
+
+	// Merge adjacent + interchange into one directed graph
+	const directed = new Map<string, Set<string>>();
+	const mergeIntoDirected = (src: Map<string, any>) => {
+		for (const [u, vs] of src) {
+			if (!directed.has(u)) directed.set(u, new Set());
+			const set = directed.get(u)!;
+			for (const v of toSet(vs)) set.add(v);
+		}
+	};
+	mergeIntoDirected(g.adjacent);
+	mergeIntoDirected(g.interchange);
+
+	const sccs = findSCCs(directed);
+	// A strongly connected graph has exactly one SCC
+	expect(sccs.length).toBe(1);
+}
+
 describe("stationLoader data integrity", () => {
 	test("metro-only graph and stations pass integrity checks", async () => {
 		await assertGraphProperties(false);
@@ -170,5 +244,13 @@ describe("stationLoader data integrity", () => {
 
 	test("CPTM-inclusive graph and stations pass integrity checks", async () => {
 		await assertGraphProperties(true);
+	});
+
+	test("metro-only graph is strongly connected", async () => {
+		await assertStronglyConnected(false);
+	});
+
+	test("CPTM-inclusive graph is strongly connected", async () => {
+		await assertStronglyConnected(true);
 	});
 });

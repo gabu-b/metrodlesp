@@ -33,20 +33,18 @@ describe("map embed protocol", () => {
 	});
 
 	test("buildMapIframeKey is stable across dynamic map param changes", () => {
-		const key1 = buildMapIframeKey("station-123", "/assets/lines.geojson", "abc");
-		const key2 = buildMapIframeKey("station-123", "/assets/lines.geojson", "abc");
+		const key1 = buildMapIframeKey("station-123", "/assets/lines.geojson");
+		const key2 = buildMapIframeKey("station-123", "/assets/lines.geojson");
 
 		expect(key1).toBe(key2);
 	});
 
 	test("buildMapIframeKey changes only when static map context changes", () => {
-		const base = buildMapIframeKey("station-123", "/assets/lines.geojson", "abc");
-		const otherStation = buildMapIframeKey("station-999", "/assets/lines.geojson", "abc");
-		const otherData = buildMapIframeKey("station-123", "/assets/other-lines.geojson", "abc");
-		const otherKey = buildMapIframeKey("station-123", "/assets/lines.geojson", "def");
+		const base = buildMapIframeKey("station-123", "/assets/lines.geojson");
+		const otherStation = buildMapIframeKey("station-999", "/assets/lines.geojson");
+		const otherData = buildMapIframeKey("station-123", "/assets/other-lines.geojson");
 
 		expect(otherStation).not.toBe(base);
 		expect(otherData).not.toBe(base);
-		expect(otherKey).not.toBe(base);
 	});
 });

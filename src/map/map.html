@@ -18,8 +18,7 @@
 <script>
 	const WIDTH = 512,
 		HEIGHT = 512; // or 640x640
-	const MAPTILER_KEY = new URLSearchParams(location.search).get("k");
-	const styleUrl = `https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`;
+	const styleUrl = "https://tiles.openfreemap.org/styles/bright";
 
 	// Read center from URL query params if provided
 	const params = new URLSearchParams(location.search);

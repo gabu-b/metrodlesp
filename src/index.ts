@@ -6,7 +6,6 @@ import { GameState, Stats } from "./state.js";
 import * as logic from "./logic";
 import { normalize } from "./logic";
 import { buildMapIframeKey, buildMapUpdateMessage, mapParamsEqual, MapParams } from "./map/embedProtocol.js";
-import { selectMapTilerKey } from "./map/keys.js";
 // @ts-ignore
 import mapUrl from "./map/map.html?url";
 // @ts-ignore
@@ -583,18 +582,6 @@ let mapIframeReady = false;
 let mapPendingParams: MapParams | null = null;
 let mapMessageListenerAttached = false;
 
-let selectedMapKey: string | undefined;
-let mapKeyComputed = false;
-
-function getActiveMapKey(): string | undefined {
-	if (mapKeyComputed) return selectedMapKey;
-	const env = (import.meta as any).env;
-	const k1 = env.VITE_MAPTILER_KEY;
-	const k2 = env.VITE_MAPTILER_KEY2;
-	selectedMapKey = selectMapTilerKey(k1, k2, getSPNow());
-	mapKeyComputed = true;
-	return selectedMapKey;
-}
 
 function computeMapParams(): MapParams {
 	const isWon = gameState.status === "won";
@@ -639,11 +626,8 @@ function renderMap() {
 	if (mapParams.interactive) {
 		params.set("interact", "1");
 	}
-	// Append MapTiler key if available via Vite env (not present in tests/build output)
-	const VITE_KEY = getActiveMapKey();
-	if (VITE_KEY) params.set("k", VITE_KEY);
 	const nextSrc = mapUrl + (params.toString() ? `?${params.toString()}` : "");
-	const nextKey = buildMapIframeKey(solution.id, linesUrl, VITE_KEY);
+	const nextKey = buildMapIframeKey(solution.id, linesUrl);
 
 	if (!mapIframeEl || mapIframeKey !== nextKey) {
 		mapDiv.innerHTML = "";

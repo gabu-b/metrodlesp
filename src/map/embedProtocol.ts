@@ -42,6 +42,6 @@ export function buildMapUpdateMessage(params: MapParams): MapUpdateMessage {
 	};
 }
 
-export function buildMapIframeKey(solutionId: string, dataUrl: string, maptilerKey?: string | null): string {
-	return `${solutionId}|${dataUrl}|${maptilerKey ?? ""}`;
+export function buildMapIframeKey(solutionId: string, dataUrl: string): string {
+	return `${solutionId}|${dataUrl}`;
 }

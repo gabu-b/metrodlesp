@@ -593,6 +593,22 @@ button {
 	display: flex;
 	flex-direction: column;
 	padding-bottom: 24px;
+	scrollbar-color: #444 #1a1a1a;
+	scrollbar-width: thin;
+}
+
+.guesses::-webkit-scrollbar {
+	width: 6px;
+}
+.guesses::-webkit-scrollbar-track {
+	background: #1a1a1a;
+}
+.guesses::-webkit-scrollbar-thumb {
+	background: #444;
+	border-radius: 3px;
+}
+.guesses::-webkit-scrollbar-thumb:hover {
+	background: #666;
 }
 
 #guesses {

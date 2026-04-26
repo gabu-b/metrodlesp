@@ -3,8 +3,8 @@
 We query them from: https://query.wikidata.org/
 
 # São Paulo Metro stations
-SELECT ?station ?connecting_line ?connecting_lineLabel ?coordinate_location ?station_code ?stationLabel WHERE {
-  ?station wdt:P31 wd:Q928830.
+SELECT DISTINCT ?station ?connecting_line ?connecting_lineLabel ?coordinate_location ?station_code ?stationLabel WHERE {
+  ?station wdt:P31/wdt:P279* wd:Q55488.
   SERVICE wikibase:label { bd:serviceParam wikibase:language "pt,en". }
   ?station wdt:P16 wd:Q483343.
   OPTIONAL { ?station wdt:P81 ?connecting_line. }
@@ -18,7 +18,7 @@ ORDER BY (?stationLabel)
 
 # São Paulo Metro station adjacencies
 SELECT DISTINCT ?station ?adjacent_station WHERE {
-  ?station wdt:P31/wdt:P279* wd:Q928830; # station is metro station
+  ?station wdt:P31/wdt:P279* wd:Q55488; # station is metro station
     wdt:P16 wd:Q483343; # is in SP Metro
     wdt:P5817 wd:Q55654238; # is in use
     p:P197 ?adjacent_station_prop. # adjacent statement
@@ -33,11 +33,11 @@ ORDER BY ?station ?adjacent_station
 
 # São Paulo Metro station interchanges
 SELECT ?station ?interchange_station WHERE {
-  ?station wdt:P31/wdt:P279* wd:Q928830; # is a subway station
+  ?station wdt:P31/wdt:P279* wd:Q55488; # is a subway station
     wdt:P16 wd:Q483343; # in SP subway
     wdt:P5817 wd:Q55654238; # in use
     wdt:P833 ?interchange_station. # interchanges with this
-  ?interchange_station wdt:P31/wdt:P279* wd:Q928830; # is a subway station
+  ?interchange_station wdt:P31/wdt:P279* wd:Q55488; # is a subway station
     wdt:P16 wd:Q483343; # in SP subway
     wdt:P5817 wd:Q55654238; # in use
   SERVICE wikibase:label { bd:serviceParam wikibase:language "pt,en". }
@@ -53,6 +53,8 @@ SELECT DISTINCT ?station ?connecting_line ?connecting_lineLabel ?coordinate_loca
            (wdt:P1192|wdt:P81) ?connecting_line.
   OPTIONAL { ?station wdt:P625 ?coordinate_location. }
   ?connecting_line wdt:P5817 wd:Q55654238. # line is in use
+  FILTER(?connecting_line != wd:Q10278819) # ignore Expresso Turistico
+  FILTER(?connecting_line != wd:Q10278789) # ignore Expresso Aeroporto
   SERVICE wikibase:label { bd:serviceParam wikibase:language "pt,en". }
 }
 ORDER BY (?stationLabel)
@@ -70,11 +72,13 @@ SELECT DISTINCT ?station ?adjacent_station WHERE {
   ?adjacent_station wdt:P5817 wd:Q55654238. # adjacent station in use
   ?connecting_line wdt:P16 ?network2; # connecting line in CPTM
     wdt:P5817 wd:Q55654238. # and in use
+  FILTER(?connecting_line != wd:Q10278819) # ignore Expresso Turistico
+  FILTER(?connecting_line != wd:Q10278789) # ignore Expresso Aeroporto
   SERVICE wikibase:label { bd:serviceParam wikibase:language "pt,en". }
 }
 ORDER BY ?station ?adjacent_station
 
-# All interchanges: No new one?
+# All interchanges
 SELECT ?station ?interchange_station WHERE {
   VALUES ?network { wd:Q483343 wd:Q110914375 }
   VALUES ?network2 { wd:Q483343 wd:Q110914375 }

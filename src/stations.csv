@@ -14,19 +14,24 @@ http://www.wikidata.org/entity/Q4944343,http://www.wikidata.org/entity/Q3308465,
 http://www.wikidata.org/entity/Q4961886,http://www.wikidata.org/entity/Q3294315,Linha 3 do Metrô de São Paulo,Point(-46.60715 -23.54636),BRE,Estação Bresser-Mooca
 http://www.wikidata.org/entity/Q2925324,http://www.wikidata.org/entity/Q588499,Linha 2 do Metrô de São Paulo,Point(-46.648035 -23.568098),BGD,Estação Brigadeiro
 http://www.wikidata.org/entity/Q4974689,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.688305555 -23.627111111),BCB,Estação Brooklin
+http://www.wikidata.org/entity/Q18475266,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.673611 -23.629444),BPA,Estação Brooklin Paulista
 http://www.wikidata.org/entity/Q107232685,http://www.wikidata.org/entity/Q3294315,Linha 3 do Metrô de São Paulo,Point(-46.615881 -23.547826),BAS,Estação Brás
 http://www.wikidata.org/entity/Q5002360,http://www.wikidata.org/entity/Q3308457,Linha 4 do Metrô de São Paulo,Point(-46.70814 -23.57182),BUT,Estação Butantã
 http://www.wikidata.org/entity/Q18475274,http://www.wikidata.org/entity/Q5430612,Linha 15 do Metrô de São Paulo,Point(-46.537678 -23.595354),CAD,Estação Camilo Haddad
 http://www.wikidata.org/entity/Q8076578,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.68251 -23.61881),CPB,Estação Campo Belo
+http://www.wikidata.org/entity/Q8076578,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.68251 -23.61881),CPB,Estação Campo Belo
 http://www.wikidata.org/entity/Q8076578,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.68251 -23.61881),S/D,Estação Campo Belo
+http://www.wikidata.org/entity/Q8076578,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.68251 -23.61881),S/D,Estação Campo Belo
 http://www.wikidata.org/entity/Q5028448,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.759148 -23.649374),CPL,Estação Campo Limpo
 http://www.wikidata.org/entity/Q5037175,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.768177 -23.659251),CPR,Estação Capão Redondo
 http://www.wikidata.org/entity/Q5037696,http://www.wikidata.org/entity/Q3362568,Linha 1 do Metrô de São Paulo,Point(-46.624904 -23.509662),CDU,Estação Carandiru
 http://www.wikidata.org/entity/Q5046842,http://www.wikidata.org/entity/Q3294315,Linha 3 do Metrô de São Paulo,Point(-46.563513 -23.537599),CAR,Estação Carrão
+http://www.wikidata.org/entity/Q18475286,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.695278 -23.613986),CZD,Estação Chucri Zaidan
 http://www.wikidata.org/entity/Q5118642,http://www.wikidata.org/entity/Q588499,Linha 2 do Metrô de São Paulo,Point(-46.63061 -23.59262),CKB,Estação Chácara Klabin
 http://www.wikidata.org/entity/Q5118642,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.63061 -23.59262),CKB,Estação Chácara Klabin
 http://www.wikidata.org/entity/Q5137302,http://www.wikidata.org/entity/Q588499,Linha 2 do Metrô de São Paulo,Point(-46.670603 -23.55431),CLI,Estação Clínicas
 http://www.wikidata.org/entity/Q5158299,http://www.wikidata.org/entity/Q3362568,Linha 1 do Metrô de São Paulo,Point(-46.641142 -23.636209),CON,Estação Conceição
+http://www.wikidata.org/entity/Q18475293,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.661764 -23.626944),CGN,Estação Congonhas
 http://www.wikidata.org/entity/Q2994646,http://www.wikidata.org/entity/Q588499,Linha 2 do Metrô de São Paulo,Point(-46.66091 -23.557516),CNS,Estação Consolação
 http://www.wikidata.org/entity/Q8779010,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.66861 -23.60979),ECT,Estação Eucaliptos
 http://www.wikidata.org/entity/Q8779010,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.66861 -23.60979),S/D,Estação Eucaliptos
@@ -46,6 +51,7 @@ http://www.wikidata.org/entity/Q15243160,http://www.wikidata.org/entity/Q3308457
 http://www.wikidata.org/entity/Q15243160,http://www.wikidata.org/entity/Q3362568,Linha 1 do Metrô de São Paulo,Point(-46.63361 -23.537629),LUZ,Estação Luz
 http://www.wikidata.org/entity/Q6758759,http://www.wikidata.org/entity/Q3294315,Linha 3 do Metrô de São Paulo,Point(-46.655814 -23.533862),DEO,Estação Marechal Deodoro
 http://www.wikidata.org/entity/Q6890218,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.661944444 -23.603611111),MOE,Estação Moema
+http://www.wikidata.org/entity/Q10275996,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.701642 -23.621593),MRB,Estação Morumbi
 http://www.wikidata.org/entity/Q10276020,http://www.wikidata.org/entity/Q5430612,Linha 15 do Metrô de São Paulo,Point(-46.561944444 -23.582222222),ORT,Estação Oratório
 http://www.wikidata.org/entity/Q8779071,http://www.wikidata.org/entity/Q3308457,Linha 4 do Metrô de São Paulo,Point(-46.6720982 -23.560865),FRE,Estação Oscar Freire
 http://www.wikidata.org/entity/Q15265202,http://www.wikidata.org/entity/Q3294315,Linha 3 do Metrô de São Paulo,Point(-46.667358 -23.525505),BFU,Estação Palmeiras-Barra Funda (Metrô)
@@ -79,7 +85,9 @@ http://www.wikidata.org/entity/Q7688505,http://www.wikidata.org/entity/Q3294315,
 http://www.wikidata.org/entity/Q7809083,http://www.wikidata.org/entity/Q3362568,Linha 1 do Metrô de São Paulo,Point(-46.631963 -23.530832),TRD,Estação Tiradentes
 http://www.wikidata.org/entity/Q3071513,http://www.wikidata.org/entity/Q588499,Linha 2 do Metrô de São Paulo,Point(-46.655127 -23.562549),TRI,Estação Trianon-Masp
 http://www.wikidata.org/entity/Q3309828,http://www.wikidata.org/entity/Q3362568,Linha 1 do Metrô de São Paulo,Point(-46.603226 -23.480065),TUC,Estação Tucuruvi
+http://www.wikidata.org/entity/Q19707412,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.678611 -23.622222),VJD,Estação Vereador José Diniz
 http://www.wikidata.org/entity/Q7921287,http://www.wikidata.org/entity/Q3362568,Linha 1 do Metrô de São Paulo,Point(-46.63986 -23.568958),VGO,Estação Vergueiro
+http://www.wikidata.org/entity/Q18475857,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.688611 -23.615556),VCD,Estação Vila Cordeiro
 http://www.wikidata.org/entity/Q5244825,http://www.wikidata.org/entity/Q588499,Linha 2 do Metrô de São Paulo,Point(-46.69083 -23.546513),VMD,Estação Vila Madalena
 http://www.wikidata.org/entity/Q5686126,http://www.wikidata.org/entity/Q3362568,Linha 1 do Metrô de São Paulo,Point(-46.634667 -23.589431),VMN,Estação Vila Mariana
 http://www.wikidata.org/entity/Q7929998,http://www.wikidata.org/entity/Q3294315,Linha 3 do Metrô de São Paulo,Point(-46.530691 -23.531894),VTD,Estação Vila Matilde
@@ -97,10 +105,3 @@ http://www.wikidata.org/entity/Q5692522,http://www.wikidata.org/entity/Q5430612,
 http://www.wikidata.org/entity/Q5692522,http://www.wikidata.org/entity/Q588499,Linha 2 do Metrô de São Paulo,Point(-46.581999 -23.584519),VPM,Terminal Intermodal Vila Prudente
 http://www.wikidata.org/entity/Q5692522,http://www.wikidata.org/entity/Q5430612,Linha 15 do Metrô de São Paulo,Point(-46.581999 -23.584519),VPM,Terminal Intermodal Vila Prudente
 http://www.wikidata.org/entity/Q7930027,http://www.wikidata.org/entity/Q3308457,Linha 4 do Metrô de São Paulo,Point(-46.73334 -23.59145),VSO,Terminal Intermodal Vila Sônia
-http://www.wikidata.org/entity/Q10275996,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.701642 -23.621593),MOB,Estação Morumbi
-http://www.wikidata.org/entity/Q18475286,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.695504 -23.613945),CZD,Estação Chucri Zaidan
-http://www.wikidata.org/entity/Q18475857,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.688611 -23.615556),VCD,Estação Vila Cordeiro
-http://www.wikidata.org/entity/Q8076578,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.683458 -23.618521),CPB,Estação Campo Belo
-http://www.wikidata.org/entity/Q19707412,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.678611 -23.622222),VJD,Estação Vereador José Diniz
-http://www.wikidata.org/entity/Q18475266,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.673611 -23.629444),BPA,Estação Brooklin Paulista
-http://www.wikidata.org/entity/Q18475293,http://www.wikidata.org/entity/Q5430578,Linha 17 do Metrô de São Paulo,Point(-46.661764 -23.626944),CGN,Estação Aeroporto de Congonhas

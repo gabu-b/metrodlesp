@@ -1,139 +1,47 @@
 # Metrodle SP
 
-A daily, mobile‑first guessing game inspired by Wordle and Metrodle — but for São Paulo’s metro/CPTM network. Each day
-you get one station to guess in up to 6 tries. Autocomplete by station or line name, per‑line feedback, distances in
-number of stops, stats, and easy sharing.
+Daily station-guessing game for São Paulo Metro (with train mode). The docs are in Portuguese.
 
-## Features
+Jogo diário de adivinhação de estação do Metrô de São Paulo (com modo CPTM).
+Site: https://metrodle.com.br/
 
-- Daily puzzle determined by date (same for all players)
-- 6 attempts; prevents duplicate guesses
-- Autocomplete and search by station name or line name (e.g., "Azul", "Vermelha")
-- Virtual QWERTY keyboard optimized for mobile; keys fade when they can’t form a valid continuation
-- Clear feedback per guess:
-  - Line chips for the guessed station; non‑matching lines show a red X overlay (color remains visible)
-  - Distance to the solution in number of stops (using a BFS on the adjacency graph)
-- Suggestions list with line chips and grouping by line keywords
-- Stats dialog with vertical histogram (1–6 attempts + X for losses)
-- Share text with per‑guess squares and distance
-- Dark theme UI
+## Desenvolvimento
 
-## Tech stack
+Pré-requisito: Node.js 18+.
 
-- TypeScript + Vite (dev server and build)
-- Vanilla DOM (no frameworks)
-- ESM modules (browser and Node tests)
-- Unit tests via Node’s native test runner
+```bash
+npm install
+npm run dev
+```
 
-## Quick start (development)
+O Vite sobe a aplicação em `http://localhost:5173`.
 
-Prerequisites: Node.js 18+ and npm
+## Scripts
 
-1. Install dependencies
+| Comando | O que faz |
+| --- | --- |
+| `npm run dev` | Inicia o servidor de desenvolvimento (Vite) |
+| `npm run build` | Gera o build de produção em `build/` |
+| `npm run preview` | Serve localmente o build de produção |
+| `npm run test` | Executa `tsc` e Vitest (`src/__tests__/*.test.ts`) |
+| `npm run typecheck` | Executa `tsc` |
+| `npm run format` | Formata com Prettier |
+| `npm run compress:lines` | Regenera `src/map/lines.geojson` a partir de `src/map/original_lines.geojson` |
 
-- npm install
+## Ambiente
 
-2. Create an .env with your MapTiler key (for the embedded map)
+Não é necessária chave de API para desenvolvimento local (`.env.example` é propositalmente vazio).
 
-- Copy .env.example to .env and set VITE_MAPTILER_KEY
+## Dados e arquivos de mapa
 
-3. Start the dev server
+- Dados do modo Metrô: `src/stations.csv`, `src/adjacencies.csv`, `src/interchanges.csv`
+- Dados do modo CPTM: `src/data/*_with_cptm.csv`
+- Definição de linhas: `src/lines.ts`
+- Mapa embarcado e geometria de linhas: `src/map/`
 
-- npm run dev
-- Open the URL shown (default http://localhost:5173)
+Para o fluxo de geração/compressão das linhas do mapa, veja `src/map/README.md`.
 
-Notes:
+## Observações
 
-- The app uses an embedded map at public/map/map.html. The API key is passed via query string from the game iframe.
-- The Vite config sets base to "/metrodlesp/" for production (GitHub Pages under a repo path). Dev server works
-  normally.
-
-## Build
-
-- npm run build
-- Output is written to ./build (configured in vite.config.ts)
-
-## Preview production build
-
-- npm run preview
-
-## Tests
-
-- npm test
-- This compiles TypeScript to ./dist and runs Node’s test runner against dist/**tests**/\*.js
-
-## Environment variables
-
-- VITE_MAPTILER_KEY: Your MapTiler API key used by the embedded MapLibre map (read in public/map/map.html via URL param)
-
-## Data
-
-- Stations: src/stations.csv (derived from Wikidata)
-  - Fields consumed include: station_code (used as Station.id), stationLabel (name; leading "Estação" stripped), line
-    numbers (numeric IDs), wikidata item (stored as wikidataId), coordinate_location (parsed to lat/lon when present)
-- Adjacencies: src/adjacencies.csv (pairs of Wikidata IDs defining neighboring stations). Used to compute BFS distances.
-- Interchanges: src/interchanges.csv (pairs of Wikidata IDs defining interchange connections with 0 distance between
-  physically connected stations on different lines)
-- Lines: src/lines.ts (single source of truth for line IDs, names, and colors)
-- The loader aggregates lines per station and ignores invalid/unknown rows. Unit tests validate that all station lines
-  exist in LINES and that station data is well‑formed.
-
-## Map
-
-- The game embeds public/map/map.html in an iframe and passes lon/lat/z and the MapTiler key via query string.
-- The map hides labels and desaturates transit colors, drawing a neutral rendition and a circle around the center
-  point (the solution station area).
-- You can optionally add your own GeoJSON overlays (lines/stations) by adding a geojson source and layers in
-  public/map/map.html.
-
-## Deployment (GitHub Pages)
-
-- GitHub Actions workflow at .github/workflows/deploy.yml builds with Vite and publishes ./build to Pages.
-- Ensure repository Pages is configured to use GitHub Actions.
-- The Vite base is set to "/metrodlesp/" so assets resolve under the repo path (e.g., https://<user>
-  .github.io/metrodlesp/).
-
-## Project structure (high level)
-
-- index.html — App shell (loads /src/index.ts in dev)
-- styles.css — Global styles
-- src/
-  - index.ts — Main UI and game loop
-  - keyboard.ts — Virtual keyboard (QWERTY) & autocomplete
-  - stationLoader.ts — CSV loading and transformation (stations + adjacency graph + BFS)
-  - lines.ts — Line IDs, names, colors
-  - logic.ts — Pure functions (hashing, candidate search, line knowledge, share)
-  - state.ts — Load/save game state and stats (localStorage)
-  - **tests**/ — Unit tests (run after building to dist)
-- public/
-  - map/map.html — MapLibre + MapTiler embedded map used by the game
-- build/ — Production build output (generated)
-- dist/ — tsconfig outDir for tests (generated by npm test)
-
-## How to play (short)
-
-- Type the station name (or a line name to browse stations) and submit.
-- Each guess shows which lines match the solution (colored chips) and which don’t (red X overlay). It also shows how
-  many stops away that station is from the solution.
-- You have 6 guesses. Your stats are tracked locally.
-
-## Contributing
-
-- See CONTRIBUTING.md for guidelines and local development tips.
-
-## License
-
-- See LICENSE for details.
-
-## Attribution
-
-- Map data © OpenStreetMap contributors. Tiles/style via MapTiler/OpenMapTiles. Respect provider terms.
-
-## Troubleshooting
-
-- Blank map: ensure you set VITE_MAPTILER_KEY in .env and are running via npm run dev or a static server (not file://).
-- CSV changes not reflected: stop dev server and restart, or hard refresh.
-- Share/clipboard not working: test over http://localhost with a secure context when possible; some APIs are restricted
-  under file://.
-- Paths under GitHub Pages: base is "/metrodlesp/"; if you change the repo name or host at root, update vite.config.ts
-  accordingly.
+- `npm test` e `npm run typecheck` executam `tsc`, que atualiza `dist/`.
+- Veja `CONTRIBUTING.md` para diretrizes de contribuição.

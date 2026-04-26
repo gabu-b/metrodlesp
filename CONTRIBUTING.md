@@ -1,67 +1,45 @@
-Project: Metrodle SP
+# Contribuindo com o Metrodle SP
 
-Overview
+Obrigado por contribuir.
 
-- A daily web puzzle inspired by Wordle, but for São Paulo’s metro/CPTM stations.
-- Pure HTML + TypeScript (compiled to dist) + CSS. No bundler required.
+## Início rápido
 
-Getting started
+1. Instale Node.js 18+.
+2. Instale as dependências: `npm install`.
+3. Inicie o ambiente local: `npm run dev`.
 
-1. Install Node.js LTS.
-2. Install deps: npm install
-3. Build: npm run build
-4. Open index.html in a browser (mobile recommended) or use any static server.
+## Comandos
 
-Project structure
+| Comando | Finalidade |
+| --- | --- |
+| `npm run dev` | Inicia o servidor de desenvolvimento (Vite) |
+| `npm run build` | Gera os assets de produção em `build/` |
+| `npm run preview` | Pré-visualiza localmente o build de produção |
+| `npm run test` | Executa `tsc` e Vitest |
+| `npm run typecheck` | Executa `tsc` |
+| `npm run format` | Formata com Prettier |
 
-- index.html: HTML shell that loads ./dist/index.js
-- styles.css: minimal mobile-first styling
-- src/index.ts: game logic, dataset, UI wiring
-- tsconfig.json: TypeScript compiler configuration
+## Convenções de código
 
-Game rules (current implementation)
+- Use TypeScript + ESM e mantenha imports locais em `src/` com sufixo `.js`.
+- Sempre que possível, mantenha lógica pura em `src/logic.ts` e integração de DOM em `src/index.ts`.
+- Mantenha IDs de estação como QIDs do Wikidata e IDs de linha alinhados com `src/lines.ts`.
+- Use `new URL("./file", import.meta.url)` para carregar CSVs/assets locais.
+- Preserve a lógica de reset diário no horário de São Paulo (UTC-3) em `src/index.ts`.
 
-- One game per day (solution selected via date-based hash)
-- 6 attempts max
-- Search/autocomplete by station name or line name
-- After each wrong guess, you see per-line color feedback (matches vs. misses)
-- Stats saved to localStorage (played, wins, streak, best)
-- Share result via Web Share API or clipboard fallback
-- Map image is currently a placeholder; see TODO below
+## Testes
 
-Data model
+- Rode `npm test` antes de abrir PR.
+- Adicione/atualize testes em `src/__tests__/` quando houver mudança de comportamento.
 
-- Lines have an id, name, and color (see LINES in src/index.ts)
-- Stations have an id, name, and an array of line ids
-- Extend STATIONS with real data; keep ids stable once published
+## Alterações em dados e mapa
 
-Contributing guidelines
+- Dados do Metrô: `src/stations.csv`, `src/adjacencies.csv`, `src/interchanges.csv`.
+- Dados da CPTM: `src/data/*_with_cptm.csv`.
+- Para o fluxo de geometria das linhas do mapa, siga `src/map/README.md`.
 
-- Keep PRs small and focused. Write clear titles and descriptions.
-- Maintain TypeScript strictness (tsconfig strict: true). Avoid using any.
-- Prefer small, composable functions. Keep pure logic testable without the DOM.
-- Keep mobile-first UX; test on a phone if possible.
-- Accessibility: labels, roles, readable contrast, keyboard focusable buttons.
-- Don’t add heavy dependencies unless necessary. Prefer web standards APIs.
+## Pull requests
 
-Coding style
-
-- Use TypeScript with explicit types for public functions.
-- Use const/let, avoid var. Avoid mutation where possible.
-- Use npm run format to format the code
-
-Testing
-
-- npm test
-- Clear localStorage between test runs when needed.
-- Validate flows: win on first try, win on last try, lose after 6, duplicate guess, unknown station, share.
-- Check stats update once per day only.
-
-Build and release
-
-- npm run build produces ./dist from ./src.
-- GitHub Pages or any static hosting can serve the site; ensure index.html references ./dist/index.js.
-
-Roadmap / TODO
-
-- Expand station dataset to full CPTM network.
+- Mantenha PRs pequenos e focados.
+- Descreva claramente o que mudou e por quê.
+- Inclua screenshots/GIFs para mudanças de UI.

@@ -199,7 +199,7 @@ http://www.wikidata.org/entity/Q10276226,http://www.wikidata.org/entity/Q5245848
 http://www.wikidata.org/entity/Q10276231,http://www.wikidata.org/entity/Q3296728,Linha 7 do Trem Metropolitano de São Paulo,Point(-46.82953666 -23.2090989),Estação Várzea Paulista
 http://www.wikidata.org/entity/Q2983699,http://www.wikidata.org/entity/Q5245830,Linha 11 do Trem Metropolitano de São Paulo,Point(-46.63528 -23.53509),Estação da Luz
 http://www.wikidata.org/entity/Q2983699,http://www.wikidata.org/entity/Q3296728,Linha 7 do Trem Metropolitano de São Paulo,Point(-46.63528 -23.53509),Estação da Luz
-http://www.wikidata.org/entity/Q8842747,http://www.wikidata.org/entity/Q3296728,Linha 7 do Trem Metropolitano de São Paulo,Point(-46.6893 -23.5213),Estação Água Branca
+http://www.wikidata.org/entity/Q8842747,http://www.wikidata.org/entity/Q3296728,Linha 7 do Trem Metropolitano de São Paulo,Point(-46.688115 -23.520656),Estação Água Branca
 http://www.wikidata.org/entity/Q111926727,http://www.wikidata.org/entity/Q3308465,Linha 5 do Metrô de São Paulo,Point(-46.720428 -23.655693),Santo Amaro
 http://www.wikidata.org/entity/Q5170696,http://www.wikidata.org/entity/Q3294315,Linha 3 do Metrô de São Paulo,Point(-46.471159 -23.542207),Terminal Intermodal Corinthians-Itaquera
 http://www.wikidata.org/entity/Q5170696,http://www.wikidata.org/entity/Q5245830,Linha 11 do Trem Metropolitano de São Paulo,Point(-46.471159 -23.542207),Terminal Intermodal Corinthians-Itaquera
@@ -212,3 +212,9 @@ http://www.wikidata.org/entity/Q19707353,http://www.wikidata.org/entity/Q5430612
 http://www.wikidata.org/entity/Q5692522,http://www.wikidata.org/entity/Q5430612,Linha 15 do Metrô de São Paulo,Point(-46.581999 -23.584519),Terminal Intermodal Vila Prudente
 http://www.wikidata.org/entity/Q5692522,http://www.wikidata.org/entity/Q588499,Linha 2 do Metrô de São Paulo,Point(-46.581999 -23.584519),Terminal Intermodal Vila Prudente
 http://www.wikidata.org/entity/Q7930027,http://www.wikidata.org/entity/Q3308457,Linha 4 do Metrô de São Paulo,Point(-46.73334 -23.59145),Terminal Intermodal Vila Sônia
+http://www.wikidata.org/entity/Q26257444,http://www.wikidata.org/entity/Q3293620,Linha 6 do Metrô de São Paulo,Point(-46.691447 -23.49358),Estação João Paulo I
+http://www.wikidata.org/entity/Q25448241,http://www.wikidata.org/entity/Q3293620,Linha 6 do Metrô de São Paulo,Point(-46.693671 -23.501743),Estação Freguesia do Ó
+http://www.wikidata.org/entity/Q41344200,http://www.wikidata.org/entity/Q3293620,Linha 6 do Metrô de São Paulo,Point(-46.691684 -23.514096),Estação Santa Marina
+http://www.wikidata.org/entity/Q85817186,http://www.wikidata.org/entity/Q3293620,Linha 6 do Metrô de São Paulo,Point(-46.688115 -23.520656),Estação Água Branca
+http://www.wikidata.org/entity/Q28679219,http://www.wikidata.org/entity/Q3293620,Linha 6 do Metrô de São Paulo,Point(-46.683272 -23.527301),Estação SESC-Pompéia
+http://www.wikidata.org/entity/Q30926628,http://www.wikidata.org/entity/Q3293620,Linha 6 do Metrô de São Paulo,Point(-46.676625 -23.532108),Estação Perdizes

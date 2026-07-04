@@ -17,3 +17,7 @@ node_modules/
 
 # Temporary files
 tmp/
+
+# Local map verification (not shipped)
+src/map/verify-l6.html
+l6-*.geojson
